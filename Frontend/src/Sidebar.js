@@ -5,16 +5,27 @@ import {
   List,
   ListItem,
   ListItemText,
-  IconButton,
+  ListSubheader,
+  TextField,
+  InputAdornment,
+  Avatar,
   Typography,
-  Tooltip
+  IconButton
 } from "@mui/material";
-import { Menu, ChevronLeft, ChevronRight } from "@mui/icons-material";
+import {
+  Search,
+  Assignment,
+  FormatListBulleted,
+  ChevronRight,
+  ChevronLeft
+} from "@mui/icons-material";
 
 const Sidebar = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  
-  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
 
   const items = {
     "Today": [
@@ -28,94 +39,109 @@ const Sidebar = () => {
       "File Upload Handling",
       "SCORM Preview in React"
     ],
-    "Previous 30 Days": [
-      "Next.js API and Context"
-    ]
+    "Previous 30 Days": ["Next.js API and Context"]
   };
 
   return (
     <Drawer
       variant="permanent"
       sx={{
-        width: sidebarOpen ? 280 : 90,
+        width: sidebarOpen ? 280 : 60,
         flexShrink: 0,
         "& .MuiDrawer-paper": {
-          width: sidebarOpen ? 280 : 90,
-          transition: "width 0.3s",
-          overflowX: "hidden",
-          bgcolor: "#121212",
-          color: "#fff",
-          boxShadow: "2px 0px 10px rgba(0,0,0,0.1)"
+          width: sidebarOpen ? 280 : 60,
+          backgroundColor: "#F8F9FB",
+          borderRight: "1px solid #E0E0E0",
+          padding: "16px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: sidebarOpen ? "initial" : "center",
+          transition: "width 0.3s ease-in-out"
         }
       }}
     >
-      {/* Sidebar Header */}
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", p: 2 }}>
+      {/* Profile & Toggle Button */}
+      <Box display="flex" alignItems="center" gap={sidebarOpen ? 2 : 0} mb={2} p={1}>
+        <Avatar sx={{ bgcolor: "#DA2128", width: 40, height: 40 }}>K</Avatar>
         {sidebarOpen && (
-          <Typography variant="h6" sx={{ fontWeight: "bold", fontSize: "1.2rem" }}>
-            Quiz List
-          </Typography>
+          <Box>
+            <Typography variant="subtitle1" fontWeight="bold">
+              Kevin Dukkon
+            </Typography>
+            <Typography variant="body2" color="gray">
+              hey@kevdu.co
+            </Typography>
+          </Box>
         )}
-        <Tooltip title={sidebarOpen ? "Collapse" : "Expand"}>
-          <IconButton onClick={toggleSidebar} sx={{ color: "white" }}>
-            {sidebarOpen ? <ChevronLeft /> : <ChevronRight />}
-          </IconButton>
-        </Tooltip>
+        <IconButton onClick={toggleSidebar} sx={{ ml: "auto" }}>
+          {sidebarOpen ? <ChevronLeft /> : <ChevronRight />}
+        </IconButton>
       </Box>
 
-      {/* Sidebar Content */}
+      {/* Quiz List Section */}
+      <ListItem
+        button
+        sx={{
+          backgroundColor: "#fff",
+          borderRadius: "12px",
+          mb: 2,
+          justifyContent: sidebarOpen ? "flex-start" : "center"
+        }}
+      >
+       {sidebarOpen && <Assignment sx={{ mr: sidebarOpen ? 2 : 0, color: "#007BFF" }} />}
+        {sidebarOpen && (
+          <ListItemText
+            primary="Quiz List"
+            primaryTypographyProps={{ fontWeight: "bold" }}
+          />
+        )}
+      </ListItem>
+
+      {/* Search Box */}
+      {sidebarOpen && (
+        <TextField
+          fullWidth
+          placeholder="Search"
+          variant="outlined"
+          size="small"
+          sx={{
+            mb: 2,
+            "& .MuiOutlinedInput-root": {
+              borderRadius: "12px",
+              backgroundColor: "#fff"
+            }
+          }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Search />
+              </InputAdornment>
+            )
+          }}
+        />
+      )}
+
+      {/* Sidebar List */}
       <List>
         {Object.entries(items).map(([section, notes], index) => (
-          <Box key={index} sx={{ mb: 2 }}>
-            {/* Section Title */}
+          <Box key={index}>
             {sidebarOpen && (
-              <Typography
-                variant="body2"
-                sx={{
-                  pl: 3,
-                  color: "#aaa",
-                  mt: 2,
-                  mb: 1,
-                  fontWeight: "bold",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.8px",
-                  fontSize: "0.85rem"
-                }}
-              >
+              <ListSubheader sx={{ fontSize: "0.85rem", color: "#888", mt: 2 }}>
                 {section}
-              </Typography>
+              </ListSubheader>
             )}
-            {/* Section Items */}
             {notes.map((note, idx) => (
               <ListItem
                 key={idx}
                 button
                 sx={{
-                  pl: sidebarOpen ? 3 : 2,
-                  py: 1.2,
-                  "&:hover": { bgcolor: "#222" },
-                  transition: "all 0.3s",
-                  borderRadius: "6px",
-                  mx: 1
+                  pl: sidebarOpen ? 2 : 1,
+                  borderRadius: "12px",
+                  justifyContent: sidebarOpen ? "flex-start" : "center"
                 }}
               >
-                <ListItemText
-                  primary={note}
-                  primaryTypographyProps={{
-                    sx: {
-                      fontSize: "0.95rem",
-                      fontWeight: "500",
-                      color: "#ddd",
-                      letterSpacing: "0.5px",
-                    }
-                  }}
-                  sx={{
-                    display: sidebarOpen ? "block" : "none",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis"
-                  }}
-                />
+                {sidebarOpen &&<FormatListBulleted sx={{ mr: sidebarOpen ? 2 : 0, color: "#007BFF" }} />}
+                {sidebarOpen && <ListItemText primary={note} />}
               </ListItem>
             ))}
           </Box>
