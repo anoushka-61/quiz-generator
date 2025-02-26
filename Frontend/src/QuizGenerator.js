@@ -401,6 +401,7 @@ const QuizGenerator = () => {
                       alignItems: "center",
                       gap: "8px",
                     }}
+                    onClick={handleSubmit}
                   >
                     <Sparkles size={20} />
                     Generate
