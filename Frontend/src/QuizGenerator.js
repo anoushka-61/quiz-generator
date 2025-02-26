@@ -120,7 +120,7 @@ const QuizGenerator = () => {
     if (!validateInput()) return;
     setLoading(true);
     toast.success("✅ Quiz data collected! Redirecting to preview...");
-    // setTimeout(() => navigate("/quiz-preview", { state: formData }), 1000);
+    setTimeout(() => navigate("/quiz-preview", { state: formData }), 15000);
   };
   const handleBackToUpload = () => {
     setShowForm(false);
