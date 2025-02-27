@@ -18,9 +18,16 @@ const uploadingFileMessages = [
   "Storing file safely...",
   "Finalizing file upload...",
   "Completing the process..."
-]
+];
+const JsonLoader = [
+  "Submitting your answers...",
+  "Validating responses...",
+  "Saving your progress...",
+  "Uploading data securely...",
+  "Finalizing quiz submission..."
+];
 
-const QuizLoader = ({ open,uploadingFile }) => {
+const QuizLoader = ({ open,uploadingFile,attemptingQuiz }) => {
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
 
   useEffect(() => {
@@ -63,7 +70,7 @@ const QuizLoader = ({ open,uploadingFile }) => {
           variant="body1"
           sx={{ fontWeight: "bold", color: "#2C3E50" }}
         >
-          {uploadingFile?uploadingFileMessages[currentMessageIndex]:loadingMessages[currentMessageIndex]}
+          {uploadingFile?uploadingFileMessages[currentMessageIndex]:attemptingQuiz?JsonLoader[currentMessageIndex]:loadingMessages[currentMessageIndex]}
         </Typography>
       </Box>
     </Modal>

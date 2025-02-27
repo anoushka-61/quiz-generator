@@ -1,6 +1,48 @@
 import React from "react";
 import QuizPerformance from "./QuizPerformance";
 
+// Consolidated JSON data for the report
+const assessmentData = {
+  firstName: "John",
+  assessmentName: "Dummy Assessment",
+  score: 170,
+  maxMarks: 200,
+  sections: [
+    { name: "Communication", secScore: "80", maxMarks: "100" },
+    { name: "Technical", secScore: "90", maxMarks: "100" },
+  ],
+  courses: [
+    {
+      title: "Course 1",
+      description: "Learn the basics of course 1 and elevate your skills.",
+      image:
+        "https://timespro.com/_next/image?url=https%3A%2F%2Ftimesproweb-static-backend-prod.s3.ap-south-1.amazonaws.com%2FEC_Banking_Pro_Web_Banner_14926ce2b5.webp&w=1080&q=75",
+    },
+    {
+      title: "Course 2",
+      description:
+        "Master advanced techniques in course 2 and stay ahead!",
+      image:
+        "https://timespro.com/_next/image?url=https%3A%2F%2Ftimesproweb-static-backend-prod.s3.ap-south-1.amazonaws.com%2FFlagship_Programme_E_Business_and_Logistics_Strategies_Emailer_1_11zon_b4e259e3f2.webp&w=1080&q=75",
+    },
+    {
+      title: "Course 3",
+      description:
+        "Explore topics in course 3 and boost your expertise.",
+      image:
+        "https://timespro.com/_next/image?url=https%3A%2F%2Ftimesproweb-static-backend-prod.s3.ap-south-1.amazonaws.com%2FDAV_db4b1dbd9c.webp&w=1080&q=75",
+    },
+  ],
+  strengths: [
+    { topic: "JavaScript", percentage: 80 },
+    { topic: "React", percentage: 75 },
+  ],
+  weaknesses: [
+    { topic: "CSS", percentage: 40 },
+    { topic: "Algorithms", percentage: 30 },
+  ],
+};
+
 // Dummy Circular Progress Slider (using SVG as a placeholder)
 const CircularProgressSlider = ({ value }) => {
   return (
@@ -75,20 +117,11 @@ const SkillLabel = ({ name, secScore, maxMarks }) => {
   );
 };
 
-// ScoreCard Component (with dummy data)
+// ScoreCard Component utilizing data from assessmentData
 const ScoreCard = () => {
-  const first_name = "John";
-  const assessmentName = "Dummy Assessment";
-  const skillData = {
-    section: [
-      { name: "Communication", secScore: "80", maxMarks: "100" },
-      { name: "Technical", secScore: "90", maxMarks: "100" },
-    ],
-    score: "170",
-    maxMarks: "200",
-  };
-  const obtainedMarks = parseFloat(skillData.score);
-  const outOfMarks = parseFloat(skillData.maxMarks);
+  const { firstName, assessmentName, score, maxMarks, sections } = assessmentData;
+  const obtainedMarks = parseFloat(score);
+  const outOfMarks = parseFloat(maxMarks);
   const totalPercent = (obtainedMarks / outOfMarks) * 100;
   const formattedTotalPercent = parseFloat(totalPercent.toFixed(2));
 
@@ -96,7 +129,7 @@ const ScoreCard = () => {
     <div className="score-card">
       <div className="score-card--head">
         <div className="score-card--head-overlay">
-          <h1>Congratulations, {first_name}!</h1>
+          <h1>Congratulations, {firstName}!</h1>
           <p style={{ padding: 0, margin: 0 }}>
             You have successfully finished the {assessmentName}.
           </p>
@@ -121,7 +154,7 @@ const ScoreCard = () => {
         }}
       >
         <div className="skill-label-gridww" style={{ width: "50%" }}>
-          {skillData?.section?.map((v, idx) => (
+          {sections?.map((v, idx) => (
             <SkillLabel key={idx} {...v} />
           ))}
         </div>
@@ -133,40 +166,18 @@ const ScoreCard = () => {
         </div>
       </div>
       <div className="score-card--foot flexbox-center">
-        {/* <div className="info-circle">ℹ️</div> */}
-        <div
-        //   dangerouslySetInnerHTML={{
-        //     __html: "Keep up the great work! <b>Improvement</b> is on the way.",
-        //   }}
-        >
-      <QuizPerformance strengths={strengths} weaknesses={weaknesses} />
-        </div>
+        <QuizPerformance
+          strengths={assessmentData.strengths}
+          weaknesses={assessmentData.weaknesses}
+        />
       </div>
     </div>
   );
 };
 
+// RecommendedCards Component utilizing assessmentData courses
 const RecommendedCards = () => {
-  const courses = [
-    {
-      title: "Course 1",
-      description: "Learn the basics of course 1 and elevate your skills.",
-      image:
-        "https://timespro.com/_next/image?url=https%3A%2F%2Ftimesproweb-static-backend-prod.s3.ap-south-1.amazonaws.com%2FEC_Banking_Pro_Web_Banner_14926ce2b5.webp&w=1080&q=75",
-    },
-    {
-      title: "Course 2",
-      description: "Master advanced techniques in course 2 and stay ahead!",
-      image:
-        "https://timespro.com/_next/image?url=https%3A%2F%2Ftimesproweb-static-backend-prod.s3.ap-south-1.amazonaws.com%2FFlagship_Programme_E_Business_and_Logistics_Strategies_Emailer_1_11zon_b4e259e3f2.webp&w=1080&q=75",
-    },
-    {
-      title: "Course 3",
-      description: "Explore topics in course 3 and boost your expertise.",
-      image:
-        "https://timespro.com/_next/image?url=https%3A%2F%2Ftimesproweb-static-backend-prod.s3.ap-south-1.amazonaws.com%2FDAV_db4b1dbd9c.webp&w=1080&q=75",
-    },
-  ];
+  const { courses } = assessmentData;
 
   return (
     <div className="recommended--cards--main">
@@ -179,7 +190,7 @@ const RecommendedCards = () => {
         AI Recommended Courses
       </h3>
       <p>Based on your quiz attempt</p>
-      <div className="recommended-cards" style={{boxShadow:"rgba(165, 170, 181, 0.16) 0px 3px 6px 0px;"}}>
+      <div className="recommended-cards" style={{ boxShadow:"rgba(165, 170, 181, 0.16) 0px 3px 6px 0px" }}>
         {courses?.map((course, idx) => (
           <div key={idx} className="recommended-card">
             <img
@@ -223,15 +234,6 @@ const RecommendedCards = () => {
   );
 };
 
-const strengths = [
-    { topic: "JavaScript", percentage: 80 },
-    { topic: "React", percentage: 75 },
-  ];
-  
-  const weaknesses = [
-    { topic: "CSS", percentage: 40 },
-    { topic: "Algorithms", percentage: 30 },
-  ];
 // Report Footer Component
 const ReportFoot = () => {
   return (
@@ -251,7 +253,6 @@ const AssessmentReportDummy = () => {
       {/* Inline CSS Styles */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
-
         :root {
           --black: #000;
           --white: #fff;
@@ -263,55 +264,22 @@ const AssessmentReportDummy = () => {
           --font-family-other: 'Poppins', sans-serif;
           --shadow-color: rgba(0, 0, 0, 0.1);
         }
-
         body {
           background: #f5f6fa;
           margin: 0;
           font-family: var(--font-family-other);
         }
-
         .flexbox-center {
           display: flex;
           justify-content: center;
           align-items: center;
         }
-
         .container-side-margin {
           padding: 0 20px;
         }
-
         .reports-page {
           padding: 20px;
         }
-
-        .score-card--action-bar {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 20px 0;
-        }
-
-        .back-to-icon {
-          cursor: pointer;
-          color: var(--black);
-          display: flex;
-          align-items: center;
-          gap: 5px;
-        }
-
-        .report-download-btn {
-          background: var(--white);
-          border: 1.5px solid #e4e4e4;
-          color: #00008c;
-          padding: 10px 12px;
-          border-radius: 4px;
-          display: flex;
-          align-items: center;
-          gap: 5px;
-          font-weight: 700;
-          cursor: pointer;
-        }
-
         .score-card {
           background: var(--white);
           border: 0.5px solid #e4e4e4;
@@ -343,35 +311,9 @@ const AssessmentReportDummy = () => {
           height: 100%;
           object-fit: cover;
         }
-        .score-card--body {
-          padding: 20px;
-          display: flex;
-          flex-direction: column;
-          gap: 20px;
-        }
-        .skill-label-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 10px;
-        }
-        .skill-label {
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-        }
-        .prg-slider-cont {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 10px;
-        }
-        .score-card--foot {
-          background-color: #f4f6ff;
-          padding: 10px;
-          text-align: center;
-          display: flex;
-          gap: 5px;
-          align-items: center;
+        .prg-slider-cont--label {
+          margin-top: 10px;
+          font-weight: bold;
         }
         .recommended--cards--main {
           margin: 20px 0;
@@ -389,25 +331,6 @@ const AssessmentReportDummy = () => {
           padding: 10px;
           flex: 1;
         }
-        .counselling-card {
-          display: flex;
-          background: linear-gradient(90deg, rgb(0, 0, 140) 0%, rgb(16, 16, 38) 100%);
-          color: var(--white);
-          border-radius: 12px;
-          overflow: hidden;
-          margin: 20px 0;
-        }
-        .counselling-card--right {
-          padding: 20px;
-          flex: 1;
-        }
-        .counselling-card--right h1 {
-          margin: 0 0 10px 0;
-        }
-        .counselling-card--img {
-          width: 300px;
-          object-fit: cover;
-        }
         .report-card--foot {
           text-align: center;
           padding: 14px 0;
@@ -420,17 +343,8 @@ const AssessmentReportDummy = () => {
       `}</style>
 
       <div className="reports-page container-side-margin">
-        {/* <div className="score-card--action-bar">
-          <div className="back-to-icon" onClick={() => alert("Back to Dashboard")}>
-            &#8592; Back to Dashboard
-          </div>
-          <button className="report-download-btn" onClick={() => alert("Download Report")}>
-            Download Report
-          </button>
-        </div> */}
         <ScoreCard />
         <RecommendedCards />
-        {/* <BookCounsellingCard /> */}
         {/* <ReportFoot /> */}
       </div>
     </>

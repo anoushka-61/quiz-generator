@@ -719,7 +719,12 @@ export default function QuizPreview() {
             variant="contained"
             color="primary"
             startIcon={<Publish />}
-            sx={{ textTransform: "none" }}
+            sx={{ textTransform: "none" ,backgroundImage:
+                            "linear-gradient(135deg, #FF69B4, #8A2BE2)", // Gradient background
+                      "&:hover": {
+                        backgroundImage:
+                            "linear-gradient(135deg,#8A2BE2, #FF69B4)", // Darker blue on hover
+                      },}}
           >
             Publish Quiz
           </Button>

@@ -282,6 +282,14 @@ const QuizComponent = () => {
           <div className="quiz-footer">
             <button
               className="quiz-start-button"
+              style={{
+                backgroundImage:
+                            "linear-gradient(135deg, #FF69B4, #8A2BE2)", // Gradient background
+                      "&:hover": {
+                        backgroundImage:
+                            "linear-gradient(135deg,#8A2BE2, #FF69B4)", // Darker blue on hover
+                      }
+              }}
               onClick={() => {
                 toast.success("Quiz Started!", {
                   style: {
@@ -293,7 +301,7 @@ const QuizComponent = () => {
                     boxShadow: "0px 4px 10px rgba(163, 217, 165, 0.5)",
                   },
                 });
-                navigate("/quiz-question");
+                navigate("/quiz-question?courseId="+courseId);
               }}
             >
               Start Quiz

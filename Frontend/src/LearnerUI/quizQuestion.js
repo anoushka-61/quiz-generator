@@ -8,58 +8,15 @@ import { IconButton } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import MultipleSectionsQuestions from "./MultipleSectionsQuestions";
 import { toast } from "react-hot-toast";
+import AWS from 'aws-sdk';
+import { useSearchParams,useNavigate } from "react-router-dom";
+import QuizLoader from "../QuizLoader";
 const QuizQuestion = () => {
-  const response =
-  {
-    "sections": [
-      {
-        "sectionId": 1,
-        "sectionTitle": "Mathematics",
-        "questions": [
-          {
-            "questionId": 101,
-            "questionText": "What is the square root of 144?",
-            "marks": 2,
-            "options": [
-              { "optionId": "a", "text": "10", "isCorrect": false },
-              { "optionId": "b", "text": "12", "isCorrect": true },
-              { "optionId": "c", "text": "14", "isCorrect": false },
-              { "optionId": "d", "text": "16", "isCorrect": false }
-            ]
-          },
-          {
-            "questionId": 102,
-            "questionText": "Solve: 15 + 6 × 2",
-            "marks": 3,
-            "options": [
-              { "optionId": "a", "text": "21", "isCorrect": false },
-              { "optionId": "b", "text": "27", "isCorrect": false },
-              { "optionId": "c", "text": "33", "isCorrect": false },
-              { "optionId": "d", "text": "27", "isCorrect": true }
-            ]
-          }
-        ]
-      },
-      {
-        "sectionId": 2,
-        "sectionTitle": "Science",
-        "questions": [
-          {
-            "questionId": 201,
-            "questionText": "What is the chemical symbol for water?",
-            "marks": 1,
-            "options": [
-              { "optionId": "a", "text": "H2O", "isCorrect": true },
-              { "optionId": "b", "text": "CO2", "isCorrect": false },
-              { "optionId": "c", "text": "O2", "isCorrect": false },
-              { "optionId": "d", "text": "NaCl", "isCorrect": false }
-            ]
-          }
-        ]
-      }
-    ]
-  }
-  
+  const [searchParams]=useSearchParams()
+  const navigate = useNavigate()
+    const courseId = searchParams.get('courseId')||"";
+ 
+  const s3 = new AWS.S3();
   const transformQuizData = (quizData) => {
     if (!quizData?.data?.quiz) return { sections: [] };
   
@@ -87,27 +44,35 @@ const QuizQuestion = () => {
   console.log(transformedData);
   
 
-  const [selectedSection, setSelectedSection] = useState(response.sections[0]);
-  const [selectedQuestion, setSelectedQuestion] = useState(selectedSection.questions[0]);
+  
   const [selectedValue, setSelectedValue] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false); // Default section
   
   const [sectionIndex, setSectionIndex] = useState(0);
   const [questionIndex, setQuestionIndex] = useState(0);
-
+  const [selectedAnswers, setSelectedAnswers] = useState({});
+  const [Loading, setLoading] = useState(false);
   const currentSection = transformedData.sections[sectionIndex];
   const currentQuestion = currentSection?.questions[questionIndex];
+  console.log({ currentQuestion})
  const totalQuestions = transformedData?.sections?.reduce((sum,section)=>sum+section.questions.length, 0)||0;
  const currentQuestionValue = transformedData?.sections?.slice(0, sectionIndex)?.reduce((sum, sec) => sum + sec.questions.length, 0) + questionIndex + 1; // Sum previous + current index
 
-  const handleChange = (index) => {
+ 
+ AWS.config.update({
+   accessKeyId: "AKIATTSKGAGFDMILU77D", 
+   secretAccessKey: "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", 
+   region: 'us-east-1', // Adjust the region if needed
+ });
+  const handleChange = (index,questionText,optionName) => {
     setSelectedValue(index);
+    setSelectedAnswers((prev) => ({
+      ...prev,
+      [questionText]: optionName
+    }));
   };
-  const handleSectionChange = (section) => {
-    setSelectedSection(section);
-    setSelectedQuestion(section.questions[0]);
-    setDrawerOpen(false);
-  };
+
+
   const isLastQuestion =
   sectionIndex === transformedData.sections.length - 1 &&
   questionIndex === transformedData.sections[sectionIndex].questions.length - 1;
@@ -122,13 +87,57 @@ const QuizQuestion = () => {
     // Update state to reflect the selected question and section
     if (newSectionIndex !== -1) {
       setSectionIndex(newSectionIndex);
-      setSelectedQuestion(question);
       setQuestionIndex(
         transformedData.sections[newSectionIndex].questions.findIndex((q) => q.questionId === question.questionId)
       );
     }
   };
-  
+  const handleEndQuiz = () =>{
+    setLoading(true)
+    const timestamp = Date.now();
+    const quizResponsesJSON = generateQuizResponsesJSON(transformedData, selectedAnswers);
+    console.log(quizResponsesJSON,typeof quizResponsesJSON ,quizResponsesJSON.type,"aaaaaaaaaaaaaaaa")
+    const key = `learnerResponses/${courseId}_${timestamp}`;
+    const jsonString = JSON.stringify(quizResponsesJSON, null, 2)
+    const params = {
+      Bucket: "quadragen-content-files",
+      Key: key,
+      Body: jsonString,
+      ContentType: "application/json"
+
+    };
+     s3.upload(params, (err, data) => {
+          if (err) {
+            setLoading(false)
+            console.error('Error uploading file:', err);
+            // setLoading(false);
+            toast.error("Upload failed, please try again.");
+            // setResponseFile("")
+            // setFileFailure(err);
+            // setUploadingFile(false);
+          } else {
+            console.log('File uploaded successfully:', data.Location);
+            // setLoading(false);
+            setLoading(false)
+            toast.success("Upload successful!",{
+                style: {
+              background: "#E6F4EA", // Light green background
+              color: "#1E4620", // Dark green text for contrast
+              padding: "12px 20px",
+              borderRadius: "8px",
+              border: "1px solid #A3D9A5", // Green border for a soft look
+              boxShadow: "0px 4px 10px rgba(163, 217, 165, 0.5)", // Subtle glow
+            },
+            });
+            // setResponseFile(data);
+            // setShowForm(true);
+            // setUploadingFile(false);
+            // Optionally, you can use data.Location as the URL of the uploaded file.
+          }
+        });
+       
+    navigate("/result-recommend?courseId="+courseId)
+  }
   const handleNextQuestion = () => {
     if (questionIndex < currentSection.questions.length - 1) {
       // Move to the next question within the same section
@@ -140,15 +149,33 @@ const QuizQuestion = () => {
       setQuestionIndex(0);
       setSelectedValue(null);
     } else {
-      toast.success("Quiz Completed!",{ style: {
-        background: "#E6F4EA",
-        color: "#1E4620",
-        padding: "12px 20px",
-        borderRadius: "8px",
-        border: "1px solid #A3D9A5",
-        boxShadow: "0px 4px 10px rgba(163, 217, 165, 0.5)",
-      }}); // Handle quiz completion
+      console.log(selectedAnswers)
+      const quizResponsesJSON = generateQuizResponsesJSON(transformedData, selectedAnswers);
+      handleEndQuiz()
+      navigate("/result-recommend?courseId="+courseId)
     }}
+    const generateQuizResponsesJSON = (quizData, selectedAnswers) => {
+      return {
+        data: {
+          courseId:courseId,
+          quiz: quizData.sections.map((section) => ({
+            title: section.sectionTitle,
+            questions: section.questions.map((question,index) => {
+              const selectedAnswer = selectedAnswers[question.questionText] || null;
+              const correctOption = question.options.find((option) => option.isCorrect)?.text || "Not Available";
+    
+              return {
+                question: question.questionText,
+                selected_answer: selectedAnswer,
+                correct_answer: correctOption,
+                is_correct: selectedAnswer === correctOption
+              };
+            })
+          }))
+        }
+      };
+    };
+    
   return (
     <Typography variant="div" sx ={{width:"100%", display:"flex", flexDirection:"column",justifyContent:"center",alignItems:"center"}} className="header p-6 max-w-4xl mx-auto" >
      
@@ -157,9 +184,9 @@ const QuizQuestion = () => {
         Back 
       </Button>
       <div className="ml-auto flex gap-2 header-content-left">
-        <Button variant="outlined" sx={{ color: "#6439BF", border:"1px solid #6439BF", "&:hover": { backgroundColor: "#f0e9ff" ,color:"#6439BF"} }}>End Quiz</Button>
+        <Button variant="outlined" onClick={handleEndQuiz} sx={{ color: "#6439BF", border:"1px solid #6439BF", "&:hover": { backgroundColor: "#f0e9ff" ,color:"#6439BF"} }}>End Quiz</Button>
         <Button variant="contained" onClick={handleNextQuestion} sx={{ backgroundColor: "#6439BF", "&:hover": { backgroundColor: "#512ea9" } }}>
-        { isLastQuestion ? "Finish":"Next"} →
+ { isLastQuestion ? "Finish":"Next"} →
 </Button>
       </div>
     </Typography>
@@ -185,7 +212,8 @@ const QuizQuestion = () => {
                     control={
                       <Radio
                         checked={selectedValue === option.optionId}
-                        onChange={() => handleChange(option.optionId)}
+                        onChange={() => handleChange(option.optionId, currentQuestion?.questionText,option?.text
+                        )}
                         sx={{
                           color: "#6439BF",
                           "&.Mui-checked": {
@@ -221,6 +249,7 @@ const QuizQuestion = () => {
           />
         )}
       </Typography>
+      {Loading && <QuizLoader open={Loading} attemptingQuiz={true} />}
     </Typography>
   );
 };

@@ -23,8 +23,13 @@ import { useNavigate } from "react-router-dom";
 import QuizLoader from "./QuizLoader";
 import { Sparkles } from "lucide-react"; // Using lucide-react for the icon
 import axios from "axios";
-import AWS from 'aws-sdk';
+import AWS from "aws-sdk";
 
+AWS.config.update({
+  accessKeyId: "AKIATTSKGAGFDMILU77D",
+  secretAccessKey: "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",
+  region: "us-east-1", // Adjust the region if needed
+});
 
 const s3 = new AWS.S3();
 const QuizGenerator = () => {
@@ -42,7 +47,7 @@ const QuizGenerator = () => {
   const [responseData, setResponseData] = useState(null);
   const [responseFile, setResponseFile] = useState(null);
   const [fileFailure, setFileFailure] = useState(null);
-  const[uploadingFile, setUploadingFile] = useState(false);
+  const [uploadingFile, setUploadingFile] = useState(false);
   const [fileKey, setFileKey] = useState(null);
   const navigate = useNavigate();
 
@@ -56,7 +61,6 @@ const QuizGenerator = () => {
   //   console.log({uploadedFile})
   //   if (!uploadedFile) return;
 
-
   //   let errors = {};
   //   if (!validFormats.includes(uploadedFile.type)) {
   //     toast.error("❌ Invalid file type! Upload PDF, MP4, or DOC.");
@@ -69,7 +73,7 @@ const QuizGenerator = () => {
   // };
 
   const handleFileUpload = (uploadedFile) => {
-  localStorage.removeItem("quizData");
+    localStorage.removeItem("quizData");
     if (!uploadedFile) return;
 
     let errors = {};
@@ -81,8 +85,6 @@ const QuizGenerator = () => {
     }
     setError({});
     setFile(uploadedFile);
-
-    
   };
   const handleFileChange = (e) => {
     handleFileUpload(e.target.files[0]);
@@ -107,14 +109,14 @@ const QuizGenerator = () => {
   const handleNextAfterFile = () => {
     // Generate S3 key using a FE generated path for course content upload:
     // Format: content/courseId_timestamp.ext
-   
+
     const timestamp = Date.now();
-    const fileExtension = file.name.split('.').pop();
+    const fileExtension = file.name.split(".").pop();
     const key = `content/${"course"}_${timestamp}.${fileExtension}`;
-    setFileKey(key)
+    setFileKey(key);
 
     const params = {
-      Bucket: 'quadragen-content-files',
+      Bucket: "quadragen-content-files",
       Key: key,
       Body: file,
       ContentType: file.type,
@@ -122,23 +124,23 @@ const QuizGenerator = () => {
     setLoading(true);
     s3.upload(params, (err, data) => {
       if (err) {
-        console.error('Error uploading file:', err);
+        console.error("Error uploading file:", err);
         setLoading(false);
         toast.error("Upload failed, please try again.");
-        setResponseFile("")
+        setResponseFile("");
         setFileFailure(err);
         setUploadingFile(false);
       } else {
         setLoading(false);
-        toast.success("Upload successful!",{
-            style: {
-          background: "#E6F4EA", // Light green background
-          color: "#1E4620", // Dark green text for contrast
-          padding: "12px 20px",
-          borderRadius: "8px",
-          border: "1px solid #A3D9A5", // Green border for a soft look
-          boxShadow: "0px 4px 10px rgba(163, 217, 165, 0.5)", // Subtle glow
-        },
+        toast.success("Upload successful!", {
+          style: {
+            background: "#E6F4EA", // Light green background
+            color: "#1E4620", // Dark green text for contrast
+            padding: "12px 20px",
+            borderRadius: "8px",
+            border: "1px solid #A3D9A5", // Green border for a soft look
+            boxShadow: "0px 4px 10px rgba(163, 217, 165, 0.5)", // Subtle glow
+          },
         });
         setResponseFile(data);
         setShowForm(true);
@@ -146,7 +148,6 @@ const QuizGenerator = () => {
         // Optionally, you can use data.Location as the URL of the uploaded file.
       }
     });
-    
   };
 
   const validateInput = () => {
@@ -187,9 +188,6 @@ const QuizGenerator = () => {
     setError(errors);
     return Object.keys(errors).length === 0;
   };
-
-
-
 
   const handleSubmit = async () => {
     if (!validateInput()) return;
@@ -261,7 +259,9 @@ const QuizGenerator = () => {
 
   const fetchQuizData = async () => {
     try {
-      const courseId = fileKey ? fileKey.split("/")[1].replace(/\.[^/.]+$/, "") : "";
+      const courseId = fileKey
+        ? fileKey.split("/")[1].replace(/\.[^/.]+$/, "")
+        : "";
       const getResponse = await axios.get(
         `https://hojir3vx1i.execute-api.us-east-1.amazonaws.com/default/quadragen-getQuizById?courseId=${courseId}`
       );
@@ -331,13 +331,20 @@ const QuizGenerator = () => {
                 variant="h3"
                 sx={{
                   fontFamily: "'Poppins', sans-serif",
-                  fontWeight: "700",
-                  color: "#000", // Pure Black for strong branding
-                  textTransform: "uppercase",
+                  fontWeight: 700,
+                  backgroundImage: "linear-gradient(135deg, #8A2BE2, #FF69B4)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  textTransform: "capitalize",
                   letterSpacing: "1.5px",
                 }}
               >
-                🚀 QuizPro
+                <img
+                  src="/quiz.png"
+                  alt=""
+                  style={{ width: "50px", height: "50px" }}
+                />{" "}
+                QuizPro
               </Typography>
 
               {/* Title with a Modern & Clean Look */}
@@ -390,6 +397,7 @@ const QuizGenerator = () => {
                     textTransform: "capitalize",
                     letterSpacing: "0.5px",
                     fontFamily: "'Roboto', sans-serif", // Modern, corporate feel
+                    paddingBottom: "8px",
                   }}
                 >
                   Upload Your File to Proceed
@@ -409,7 +417,6 @@ const QuizGenerator = () => {
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
-                
                 >
                   {file ? (
                     <Box
@@ -439,32 +446,57 @@ const QuizGenerator = () => {
                     </Box>
                   ) : (
                     <>
-                      <Typography variant="body2">
+                      <Typography variant="body2" sx={{ mb: 3 }}>
                         Drag & drop a file here or click below to upload
                       </Typography>
                       <Button
                         variant="contained"
                         component="label"
                         startIcon={<CloudUpload />}
-                        sx={{ mt: 2 }}
+                        sx={{
+                          fontFamily: "'Poppins', sans-serif",
+                          fontWeight: 700,
+                          color: "white", // Set text color to white
+                          backgroundImage:
+                            "linear-gradient(135deg, #FF69B4, #8A2BE2)", // Gradient background
+                      "&:hover": {
+                        backgroundImage:
+                            "linear-gradient(135deg,#8A2BE2, #FF69B4)", // Darker blue on hover
+                      }, // Gradient background
+                          padding: "10px", // Add padding to ensure background is visible
+                          display: "inline-block", // Prevent full-width background
+                          textTransform: "capitalize",
+                          letterSpacing: "1.5px",
+                          textAlign: "center",
+                        }}
                       >
                         Upload File
-                        <input type="file" hidden onChange={handleFileChange}   accept=".pdf, .doc, .docx, .mp4"/>
+                        <input
+                          type="file"
+                          hidden
+                          onChange={handleFileChange}
+                          accept=".pdf, .doc, .docx, .mp4"
+                        />
                       </Button>
                     </>
                   )}
                 </Box>
                 {error.file && (
-  <Typography color="error" sx={{ mt: 1 }}>
-    {error.file}
-  </Typography>
-)}
+                  <Typography color="error" sx={{ mt: 1 }}>
+                    {error.file}
+                  </Typography>
+                )}
                 {file && (
                   <Button
                     variant="contained"
                     color="primary"
                     startIcon={<NavigateNext />}
-                    sx={{ mt: 2 }}
+                    sx={{ mt: 2,  backgroundImage:
+                            "linear-gradient(135deg, #FF69B4, #8A2BE2)", // Gradient background
+                      "&:hover": {
+                        backgroundImage:
+                            "linear-gradient(135deg,#8A2BE2, #FF69B4)", // Darker blue on hover
+                      }, }}
                     onClick={handleNextAfterFile}
                   >
                     Let's Configure
@@ -552,8 +584,11 @@ const QuizGenerator = () => {
                       fontWeight: "bold",
                       textTransform: "none",
                       boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)", // Soft shadow
+                      backgroundImage:
+                            "linear-gradient(135deg, #FF69B4, #8A2BE2)", // Gradient background
                       "&:hover": {
-                        backgroundColor: "#2563eb", // Darker blue on hover
+                        backgroundImage:
+                            "linear-gradient(135deg,#8A2BE2, #FF69B4)", // Darker blue on hover
                       },
                       display: "flex",
                       alignItems: "center",
