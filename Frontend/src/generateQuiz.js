@@ -33,7 +33,6 @@ AWS.config.update({
 
 const s3 = new AWS.S3();
 const QuizGenerator = () => {
-  console.log({pr:process.env.REACT_APP_ACCESS_KEY_ID,})
   const [file, setFile] = useState(null);
   const [dragging, setDragging] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -44,7 +43,6 @@ const QuizGenerator = () => {
     totalMarks: "",
   });
   const [Loading, setLoading] = useState(false);
-  console.log({ Loading})
   const [error, setError] = useState({});
   const [responseData, setResponseData] = useState(null);
   const [responseFile, setResponseFile] = useState(null);
@@ -59,7 +57,6 @@ const QuizGenerator = () => {
     "application/msword",
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   ];
-console.log({file})
   // const handleFileUpload = (uploadedFile) => {
   //   console.log({uploadedFile})
   //   if (!uploadedFile) return;
@@ -93,7 +90,6 @@ console.log({file})
     
   };
   const handleFileChange = (e) => {
-    console.log({e})
     handleFileUpload(e.target.files[0]);
   };
 
@@ -116,7 +112,6 @@ console.log({file})
   const handleNextAfterFile = () => {
     // Generate S3 key using a FE generated path for course content upload:
     // Format: content/courseId_timestamp.ext
-    console.log({file})
    
     const timestamp = Date.now();
     const fileExtension = file.name.split('.').pop();
@@ -130,7 +125,6 @@ console.log({file})
       ContentType: file.type,
     };
     setLoading(true);
-    console.log(params);
     s3.upload(params, (err, data) => {
       if (err) {
         console.error('Error uploading file:', err);
@@ -140,7 +134,6 @@ console.log({file})
         setFileFailure(err);
         setUploadingFile(false);
       } else {
-        console.log('File uploaded successfully:', data.Location);
         setLoading(false);
         toast.success("Upload successful!",{
             style: {

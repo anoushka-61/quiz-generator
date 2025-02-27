@@ -17,7 +17,6 @@ const QuizComponent = () => {
         const getResponse = await axios.get(
           `https://hojir3vx1i.execute-api.us-east-1.amazonaws.com/default/quadragen-getQuizById?courseId=${courseId}`
         );
-        console.log({ abc:getResponse?.data?.data });
         setQuizData(getResponse?.data);
 
         localStorage.setItem("quizData", JSON.stringify(getResponse?.data));

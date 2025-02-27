@@ -27,7 +27,6 @@ function transformQuizData(apiData) {
   // Destructure the quiz array from the API data
   const { quiz } = apiData?.data || {};
   let totalMarks = 0;
-  console.log({ quiz, apiData });
   // Map each section in the API data to our new format
   const sections = quiz?.map((section) => {
     // Transform each active question in the section
@@ -42,13 +41,11 @@ function transformQuizData(apiData) {
           score: q?.marks,
         };
       });
-    console.log({ section, questions });
     return {
       name: section?.title,
       questions,
     };
   });
-  console.log({ sections });
   return {
     title: apiData?.data?.quizTitle,
     totalMarks,
@@ -566,7 +563,6 @@ export default function QuizPreview() {
     const localQuizData = JSON.parse(localStorage.getItem("quizData")) || {};
 
     const initialData = transformQuizData(localQuizData) || {};
-    console.log(initialData);
 
     // Calculate total marks
     initialData.totalMarks = initialData?.sections?.reduce(
