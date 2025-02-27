@@ -22,7 +22,7 @@ import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import QuizLoader from "./QuizLoader";
 import { Sparkles } from "lucide-react"; // Using lucide-react for the icon
-
+import axios from "axios";
 const QuizGenerator = () => {
   const [file, setFile] = useState(null);
   const [dragging, setDragging] = useState(false);
@@ -35,6 +35,8 @@ const QuizGenerator = () => {
   });
   const [Loading, setLoading] = useState(false);
   const [error, setError] = useState({});
+  const [responseData, setResponseData] = useState(null);
+  const [Apierror, setApiError] = useState(null);
   const navigate = useNavigate();
 
   const validFormats = [
@@ -46,10 +48,14 @@ const QuizGenerator = () => {
 
   const handleFileUpload = (uploadedFile) => {
     if (!uploadedFile) return;
+    let errors = {};
     if (!validFormats.includes(uploadedFile.type)) {
       toast.error("❌ Invalid file type! Upload PDF, MP4, or DOC.");
+      errors.file = "❌ Invalid file type! Upload PDF, MP4, or DOC.";
+      setError(errors);
       return;
     }
+    setError(errors);
     setFile(uploadedFile);
   };
 
@@ -116,11 +122,31 @@ const QuizGenerator = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = () => {
+ const handleSubmit = async() => {
     if (!validateInput()) return;
     setLoading(true);
     toast.success("✅ Quiz data collected! Redirecting to preview...");
     setTimeout(() => navigate("/quiz-preview", { state: formData }), 15000);
+
+    try {
+      const response = await axios.post(
+        "https://hy4s0t7gyl.execute-api.us-east-1.amazonaws.com/default/quadragen_quizGenerate",
+        {
+          courseFile: "quadragen-content-files/content/course4_1234567893.pdf",
+          numSections: 30,
+          questionsPerSection: 5,
+          marksPerQuestion: 10,
+        },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      setResponseData(response.data);
+      setApiError(null);
+    } catch (err) {
+      setError(err);
+      setApiError(null);
+    }
   };
   const handleBackToUpload = () => {
     setShowForm(false);
@@ -256,6 +282,7 @@ const QuizGenerator = () => {
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
+                
                 >
                   {file ? (
                     <Box
@@ -295,12 +322,16 @@ const QuizGenerator = () => {
                         sx={{ mt: 2 }}
                       >
                         Upload File
-                        <input type="file" hidden onChange={handleFileChange} />
+                        <input type="file" hidden onChange={handleFileChange}   accept=".pdf, .doc, .docx, .mp4"/>
                       </Button>
                     </>
                   )}
                 </Box>
-
+                {error.file && (
+  <Typography color="error" sx={{ mt: 1 }}>
+    {error.file}
+  </Typography>
+)}
                 {file && (
                   <Button
                     variant="contained"
