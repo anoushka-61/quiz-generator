@@ -1,6 +1,8 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const QuizComponent = () => {
+    const navigate = useNavigate()
   return (
     <>
       {/* CSS Styles */}
@@ -222,7 +224,9 @@ const QuizComponent = () => {
           <div className="quiz-footer">
             <button
               className="quiz-start-button"
-              onClick={() => alert("Quiz Started!")}
+              onClick={() => {alert("Quiz Started!")
+              navigate("/quiz-question")
+              } }
             >
               Start Quiz
             </button>

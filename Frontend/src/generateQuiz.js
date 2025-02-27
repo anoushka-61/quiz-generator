@@ -116,11 +116,12 @@ console.log({file})
   const handleNextAfterFile = () => {
     // Generate S3 key using a FE generated path for course content upload:
     // Format: content/courseId_timestamp.ext
-    setUploadingFile(true);
+    console.log({file})
+   
     const timestamp = Date.now();
-    const fileSplit = file.name.split('.');
-    const key = `content/${fileSplit[0]}_${timestamp}.${fileSplit[1]}`;
-    setFileKey(key);
+    const fileExtension = file.name.split('.').pop();
+    const key = `content/${"course"}_${timestamp}.${fileExtension}`;
+    setFileKey(key)
 
     const params = {
       Bucket: 'quadragen-content-files',
@@ -236,34 +237,34 @@ console.log({file})
         // In success scenario, call GET API immediately.
         // await fetchQuizData();
       } else {
-        toast.error(
-          `${response.data.error || "Failed to generate quiz. Please try again"}`,
-          {
-            style: {
-              background: "#FDEDED",
-              color: "#611A15",
-              padding: "12px 20px",
-              borderRadius: "8px",
-              border: "1px solid #F5C6C7",
-              boxShadow: "0px 4px 10px rgba(245, 198, 199, 0.5)",
-            },
-          }
-        );
+        // toast.error(
+        //   `${response.data.error || "Failed to generate quiz. Please try again"}`,
+        //   {
+        //     style: {
+        //       background: "#FDEDED",
+        //       color: "#611A15",
+        //       padding: "12px 20px",
+        //       borderRadius: "8px",
+        //       border: "1px solid #F5C6C7",
+        //       boxShadow: "0px 4px 10px rgba(245, 198, 199, 0.5)",
+        //     },
+        //   }
+        // );
         // On failure, wait for 2 minutes before calling GET API.
         setTimeout(fetchQuizData, 120000);
       }
     } catch (err) {
       setError(err);
-      toast.error(`${err || "Failed to generate quiz. Please try again"}`, {
-        style: {
-          background: "#FDEDED",
-          color: "#611A15",
-          padding: "12px 20px",
-          borderRadius: "8px",
-          border: "1px solid #F5C6C7",
-          boxShadow: "0px 4px 10px rgba(245, 198, 199, 0.5)",
-        },
-      });
+      // toast.error(`${err || "Failed to generate quiz. Please try again"}`, {
+      //   style: {
+      //     background: "#FDEDED",
+      //     color: "#611A15",
+      //     padding: "12px 20px",
+      //     borderRadius: "8px",
+      //     border: "1px solid #F5C6C7",
+      //     boxShadow: "0px 4px 10px rgba(245, 198, 199, 0.5)",
+      //   },
+      // });
       // On error, wait for 2 minutes before calling GET API.
       setTimeout(fetchQuizData, 120000);
     }

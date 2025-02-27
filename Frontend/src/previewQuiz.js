@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -23,322 +23,34 @@ import {
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 
-const initialDatsa = {
-  title: "My Quiz Title",
-  totalMarks: 0,
-  sections: [
-    {
-      name: "HTML Basics",
-      questions: [
-        {
-          question: "What does HTML stand for?",
-          options: [
-            "Hyperlinks and Text Markup Language",
-            "Home Tool Markup Language",
-            "Hyper Text Markup Language",
-            "Hyper Tech Markup Language",
-          ],
-          correctAnswer: "Hyper Text Markup Language",
-          score: 5,
-        },
-        {
-          question: "Which HTML tag defines an image?",
-          options: ["<img>", "<image>", "<pic>", "<src>"],
-          correctAnswer: "<img>",
-          score: 5,
-        },
-        {
-          question: "Which element defines a paragraph in HTML?",
-          options: ["<p>", "<para>", "<paragraph>", "<div>"],
-          correctAnswer: "<p>",
-          score: 5,
-        },
-      ],
-    },
-    {
-      name: "CSS Basics",
-      questions: [
-        {
-          question: "What does CSS stand for?",
-          options: [
-            "Creative Style Sheets",
-            "Cascading Style Sheets",
-            "Computer Style Sheets",
-            "Colorful Style Sheets",
-          ],
-          correctAnswer: "Cascading Style Sheets",
-          score: 5,
-        },
-        {
-          question: "Which CSS property controls text size?",
-          options: ["font-style", "text-style", "font-size", "text-size"],
-          correctAnswer: "font-size",
-          score: 5,
-        },
-        {
-          question: "Which is the correct CSS syntax?",
-          options: [
-            "body {color: black;}",
-            "{body;color:black;}",
-            "body:color=black;",
-            "body={color:black}",
-          ],
-          correctAnswer: "body {color: black;}",
-          score: 5,
-        },
-      ],
-    },
-    {
-      name: "JavaScript Basics",
-      questions: [
-        {
-          question:
-            "What is the correct syntax for referring to an external script?",
-          options: [
-            '<script href="xxx.js">',
-            '<script name="xxx.js">',
-            '<script src="xxx.js">',
-            '<script link="xxx.js">',
-          ],
-          correctAnswer: '<script src="xxx.js">',
-          score: 5,
-        },
-        {
-          question: "Inside which HTML element do we put the JavaScript?",
-          options: ["<js>", "<scripting>", "<script>", "<javascript>"],
-          correctAnswer: "<script>",
-          score: 5,
-        },
-        {
-          question: "Which operator is used to assign a value to a variable?",
-          options: ["=", "*", "-", "+"],
-          correctAnswer: "=",
-          score: 5,
-        },
-      ],
-    },
-    {
-      name: "React Basics",
-      questions: [
-        {
-          question: "What is a common way to define a React component?",
-          options: [
-            "function MyComponent() {}",
-            "def MyComponent()",
-            "createComponent(MyComponent)",
-            "component MyComponent() {}",
-          ],
-          correctAnswer: "function MyComponent() {}",
-          score: 5,
-        },
-        {
-          question: "JSX stands for?",
-          options: [
-            "JavaScript XML",
-            "JSON XML",
-            "Java Syntax eXtension",
-            "Just Simple eXpressions",
-          ],
-          correctAnswer: "JavaScript XML",
-          score: 5,
-        },
-        {
-          question: "Which hook is used for state in a functional component?",
-          options: ["useState", "useEffect", "useContext", "useReducer"],
-          correctAnswer: "useState",
-          score: 5,
-        },
-      ],
-    },
-    {
-      name: "Node.js Basics",
-      questions: [
-        {
-          question: "Which command starts a Node.js application?",
-          options: [
-            "node app.js",
-            "start app.js",
-            "run app.js",
-            "node run app.js",
-          ],
-          correctAnswer: "node app.js",
-          score: 5,
-        },
-        {
-          question: "Node.js is built on which JavaScript engine?",
-          options: ["SpiderMonkey", "Chakra", "V8", "JavaScriptCore"],
-          correctAnswer: "V8",
-          score: 5,
-        },
-        {
-          question: "Which built-in module creates a web server in Node.js?",
-          options: ["web", "http", "server", "url"],
-          correctAnswer: "http",
-          score: 5,
-        },
-      ],
-    },
-    {
-      name: "MongoDB Basics",
-      questions: [
-        {
-          question: "MongoDB is a ____ database.",
-          options: ["SQL-based", "Relational", "NoSQL", "Key-Value"],
-          correctAnswer: "NoSQL",
-          score: 5,
-        },
-        {
-          question: "Which command starts the Mongo shell?",
-          options: ["mongod", "mongo", "mongo-shell", "start-mongo"],
-          correctAnswer: "mongo",
-          score: 5,
-        },
-        {
-          question: "Which data format does MongoDB use?",
-          options: ["XML", "JSON", "BSON", "CSV"],
-          correctAnswer: "BSON",
-          score: 5,
-        },
-      ],
-    },
-    {
-      name: "TypeScript Basics",
-      questions: [
-        {
-          question: "TypeScript is a superset of which language?",
-          options: ["Java", "JavaScript", "C++", "Python"],
-          correctAnswer: "JavaScript",
-          score: 5,
-        },
-        {
-          question: "Which file extension is used for TypeScript files?",
-          options: [".js", ".ts", ".tsx", ".jsx"],
-          correctAnswer: ".ts",
-          score: 5,
-        },
-        {
-          question: "Which command compiles TypeScript?",
-          options: ["tsc", "ts-run", "compile-ts", "typescript"],
-          correctAnswer: "tsc",
-          score: 5,
-        },
-      ],
-    },
-    {
-      name: "Git Basics",
-      questions: [
-        {
-          question: "Which command initializes a new Git repository?",
-          options: ["git start", "git init", "git new", "git create"],
-          correctAnswer: "git init",
-          score: 5,
-        },
-        {
-          question: "Which command stages changes for commit?",
-          options: ["git push", "git stage", "git add", "git commit"],
-          correctAnswer: "git add",
-          score: 5,
-        },
-        {
-          question: "Which command checks the status in Git?",
-          options: ["git status", "git check", "git diff", "git info"],
-          correctAnswer: "git status",
-          score: 5,
-        },
-      ],
-    },
-    {
-      name: "DevOps Basics",
-      questions: [
-        {
-          question: "CI stands for ____ in DevOps.",
-          options: [
-            "Continuous Integration",
-            "Continuous Information",
-            "Code Integration",
-            "Code Implementation",
-          ],
-          correctAnswer: "Continuous Integration",
-          score: 5,
-        },
-        {
-          question: "Which tool is commonly used for containerization?",
-          options: ["Docker", "Jenkins", "Kubernetes", "GitLab"],
-          correctAnswer: "Docker",
-          score: 5,
-        },
-        {
-          question: "Which tool orchestrates containers?",
-          options: ["Docker", "Jenkins", "Kubernetes", "Git"],
-          correctAnswer: "Kubernetes",
-          score: 5,
-        },
-      ],
-    },
-    {
-      name: "Testing Basics",
-      questions: [
-        {
-          question: "Which framework is commonly used for testing React apps?",
-          options: ["Mocha", "Jest", "Cypress", "Jasmine"],
-          correctAnswer: "Jest",
-          score: 5,
-        },
-        {
-          question: "Which test checks functionality of separate modules?",
-          options: [
-            "Integration testing",
-            "End-to-end testing",
-            "Unit testing",
-            "Acceptance testing",
-          ],
-          correctAnswer: "Unit testing",
-          score: 5,
-        },
-        {
-          question: "Which testing simulates real user scenarios?",
-          options: [
-            "Unit testing",
-            "Integration testing",
-            "End-to-end testing",
-            "Smoke testing",
-          ],
-          correctAnswer: "End-to-end testing",
-          score: 5,
-        },
-      ],
-    },
-  ],
-};
-
 function transformQuizData(apiData) {
   // Destructure the quiz array from the API data
-  const { quiz } = apiData.data;
+  const { quiz } = apiData?.data || {};
   let totalMarks = 0;
-
+  console.log({ quiz, apiData });
   // Map each section in the API data to our new format
-  const sections = quiz.map((section) => {
+  const sections = quiz?.map((section) => {
     // Transform each active question in the section
-    const questions = section.questions
-      .filter((q) => q.is_active)
-      .map((q) => {
-        totalMarks += q.marks;
+    const questions = section?.questions
+      // ?.filter((q) => q?.is_active)
+      ?.map((q) => {
+        totalMarks += q?.marks;
         return {
-          question: q.question,
-          options: q.options,
-          correctAnswer: q.correct_answer,
-          score: q.marks,
+          question: q?.question,
+          options: q?.options,
+          correctAnswer: q?.correct_answer,
+          score: q?.marks,
         };
       });
-
+    console.log({ section, questions });
     return {
-      name: section.title,
+      name: section?.title,
       questions,
     };
   });
-
+  console.log({ sections });
   return {
-    title: "My Quiz Title", // This title can be set dynamically if needed
+    title: apiData?.data?.quizTitle,
     totalMarks,
     sections,
   };
@@ -346,539 +58,527 @@ function transformQuizData(apiData) {
 
 // Example usage:
 const apiData = {
-  "data": {
-      "status": "success",
-      "message": "Quiz uploaded successfully",
-      "quizFile": "quadragen-content-files/quizes/1740659257084_MBA-Brochure_1740653415379.json",
-      "quiz": [
+  data: {
+    status: "success",
+    message: "Quiz uploaded successfully",
+    quizFile:
+      "quadragen-content-files/quizes/1740659257084_MBA-Brochure_1740653415379.json",
+    quiz: [
+      {
+        title: "About D.Y. Patil",
+        questions: [
           {
-              "title": "About D.Y. Patil",
-              "questions": [
-                  {
-                      "question": "What was the former position held by D.Y. Patil?",
-                      "options": [
-                          "Governor of Bihar",
-                          "Governor of Tripura",
-                          "Governor of West Bengal",
-                          "All of the above"
-                      ],
-                      "correct_answer": "All of the above",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "From which state in India is D.Y. Patil?",
-                      "options": [
-                          "Maharashtra",
-                          "Karnataka",
-                          "Gujarat",
-                          "Rajasthan"
-                      ],
-                      "correct_answer": "Maharashtra",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "What was D.Y. Patil's vision for youth in India?",
-                      "options": [
-                          "To provide greater educational opportunities",
-                          "To promote agriculture",
-                          "To promote business",
-                          "To promote tourism"
-                      ],
-                      "correct_answer": "To provide greater educational opportunities",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "How many deemed universities has D.Y. Patil envisioned?",
-                      "options": [
-                          "1",
-                          "2",
-                          "3",
-                          "4"
-                      ],
-                      "correct_answer": "3",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "What was the purpose of establishing the Centre of Online Learning (COL)?",
-                      "options": [
-                          "To bridge the gap between industry expectations and student skills",
-                          "To promote online education",
-                          "To offer more courses",
-                          "To increase enrollment"
-                      ],
-                      "correct_answer": "To bridge the gap between industry expectations and student skills",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "What is D.Y. Patil's principle for success in life?",
-                      "options": [
-                          "Follow your passion",
-                          "Work hard",
-                          "Ego is the death of life",
-                          "Never give up"
-                      ],
-                      "correct_answer": "Ego is the death of life",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "From which town in Maharashtra is D.Y. Patil?",
-                      "options": [
-                          "Kolhapur",
-                          "Pune",
-                          "Mumbai",
-                          "Nagpur"
-                      ],
-                      "correct_answer": "Kolhapur",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "How many independent institutions has D.Y. Patil envisioned?",
-                      "options": [
-                          "100",
-                          "150",
-                          "200",
-                          "250"
-                      ],
-                      "correct_answer": "150",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "What was D.Y. Patil's goal?",
-                      "options": [
-                          "To spread education across India",
-                          "To promote business",
-                          "To promote agriculture",
-                          "To promote tourism"
-                      ],
-                      "correct_answer": "To spread education across India",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "What is D.Y. Patil's profession?",
-                      "options": [
-                          "Educationist",
-                          "Businessman",
-                          "Politician",
-                          "Agriculturist"
-                      ],
-                      "correct_answer": "Educationist",
-                      "marks": 1.2,
-                      "is_active": true
-                  }
-              ],
-              "is_active": true
+            question: "What was the former position held by D.Y. Patil?",
+            options: [
+              "Governor of Bihar",
+              "Governor of Tripura",
+              "Governor of West Bengal",
+              "All of the above",
+            ],
+            correct_answer: "All of the above",
+            marks: 1.2,
+            is_active: true,
           },
           {
-              "title": "MBA Overview",
-              "questions": [
-                  {
-                      "question": "What is the duration of the MBA program?",
-                      "options": [
-                          "1 year",
-                          "2 years",
-                          "3 years",
-                          "4 years"
-                      ],
-                      "correct_answer": "2 years",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "How many specializations are offered in the MBA program?",
-                      "options": [
-                          "8",
-                          "10",
-                          "11",
-                          "12"
-                      ],
-                      "correct_answer": "11",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "What is the mode of instruction for the MBA program?",
-                      "options": [
-                          "Online",
-                          "Offline",
-                          "Hybrid",
-                          "Both online and offline"
-                      ],
-                      "correct_answer": "Online",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "How many live masterclasses are included in the MBA program?",
-                      "options": [
-                          "1",
-                          "2",
-                          "3",
-                          "4"
-                      ],
-                      "correct_answer": "1",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "What is the learning approach of the MBA program?",
-                      "options": [
-                          "Flexible learning",
-                          "Rigid learning",
-                          "Self-paced learning",
-                          "Classroom learning"
-                      ],
-                      "correct_answer": "Flexible learning",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "What is the adherence of the MBA program?",
-                      "options": [
-                          "4 Quadrants of UGC",
-                          "3 Quadrants of UGC",
-                          "2 Quadrants of UGC",
-                          "5 Quadrants of UGC"
-                      ],
-                      "correct_answer": "4 Quadrants of UGC",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "Which of the following is a highlight of the MBA program?",
-                      "options": [
-                          "Placement assistance",
-                          "Cutting-edge curriculum",
-                          "Industry connect",
-                          "All of the above"
-                      ],
-                      "correct_answer": "All of the above",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "What is the focus of the MBA program?",
-                      "options": [
-                          "Business case studies",
-                          "Real-world examples",
-                          "Both business case studies and real-world examples",
-                          "None of the above"
-                      ],
-                      "correct_answer": "Both business case studies and real-world examples",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "Who designed the MBA program?",
-                      "options": [
-                          "Business professionals",
-                          "Academicians",
-                          "Both business professionals and academicians",
-                          "None of the above"
-                      ],
-                      "correct_answer": "Both business professionals and academicians",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "What is the purpose of the MBA program?",
-                      "options": [
-                          "To bridge the gap between industry expectations and student skills",
-                          "To provide theoretical knowledge",
-                          "To promote online education",
-                          "To increase enrollment"
-                      ],
-                      "correct_answer": "To bridge the gap between industry expectations and student skills",
-                      "marks": 1.2,
-                      "is_active": true
-                  }
-              ],
-              "is_active": true
+            question: "From which state in India is D.Y. Patil?",
+            options: ["Maharashtra", "Karnataka", "Gujarat", "Rajasthan"],
+            correct_answer: "Maharashtra",
+            marks: 1.2,
+            is_active: true,
           },
           {
-              "title": "Why D.Y. Patil?",
-              "questions": [
-                  {
-                      "question": "What is one of the advantages of studying at D.Y. Patil University?",
-                      "options": [
-                          "Flexible learning",
-                          "Limited course options",
-                          "Rigid learning schedule",
-                          "No industry connect"
-                      ],
-                      "correct_answer": "Flexible learning",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "What is offered at D.Y. Patil University?",
-                      "options": [
-                          "A wide range of courses across multiple disciplines",
-                          "Limited course options",
-                          "Only MBA courses",
-                          "Only engineering courses"
-                      ],
-                      "correct_answer": "A wide range of courses across multiple disciplines",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "How is the virtual classroom experience at D.Y. Patil University?",
-                      "options": [
-                          "Interactive",
-                          "Boring",
-                          "One-way communication",
-                          "No virtual classroom"
-                      ],
-                      "correct_answer": "Interactive",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "Who teaches at D.Y. Patil University?",
-                      "options": [
-                          "Distinguished faculty members and industry experts",
-                          "Inexperienced faculty",
-                          "Only industry experts",
-                          "Only faculty members"
-                      ],
-                      "correct_answer": "Distinguished faculty members and industry experts",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "What kind of support services are provided at D.Y. Patil University?",
-                      "options": [
-                          "Comprehensive support services",
-                          "Limited support services",
-                          "No support services",
-                          "Only academic support services"
-                      ],
-                      "correct_answer": "Comprehensive support services",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "How are exams conducted at D.Y. Patil University?",
-                      "options": [
-                          "Online exams from any location with internet access",
-                          "Only on-campus exams",
-                          "No exams",
-                          "Both online and on-campus exams"
-                      ],
-                      "correct_answer": "Online exams from any location with internet access",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "What is the learning approach at D.Y. Patil University?",
-                      "options": [
-                          "Flexible learning",
-                          "Rigid learning schedule",
-                          "Self-paced learning",
-                          "Classroom learning"
-                      ],
-                      "correct_answer": "Flexible learning",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "What is the purpose of the dedicated relationship officers at D.Y. Patil University?",
-                      "options": [
-                          "To provide personalized support throughout the journey",
-                          "To handle admissions",
-                          "To teach courses",
-                          "To conduct exams"
-                      ],
-                      "correct_answer": "To provide personalized support throughout the journey",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "What is the advantage of the virtual classroom environment at D.Y. Patil University?",
-                      "options": [
-                          "Interactive and engaging",
-                          "Boring and one-way communication",
-                          "No virtual classroom",
-                          "Limited interaction"
-                      ],
-                      "correct_answer": "Interactive and engaging",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "What is the advantage of the faculty at D.Y. Patil University?",
-                      "options": [
-                          "Distinguished and experienced",
-                          "Inexperienced",
-                          "Only industry experts",
-                          "Only academicians"
-                      ],
-                      "correct_answer": "Distinguished and experienced",
-                      "marks": 1.2,
-                      "is_active": true
-                  }
-              ],
-              "is_active": true
+            question: "What was D.Y. Patil's vision for youth in India?",
+            options: [
+              "To provide greater educational opportunities",
+              "To promote agriculture",
+              "To promote business",
+              "To promote tourism",
+            ],
+            correct_answer: "To provide greater educational opportunities",
+            marks: 1.2,
+            is_active: true,
           },
           {
-              "title": "MBA Specializations",
-              "questions": [
-                  {
-                      "question": "Which of the following is a specialization offered in the MBA program?",
-                      "options": [
-                          "Sales and Marketing Management",
-                          "Human Resource Management",
-                          "Hospital and Healthcare Management",
-                          "All of the above"
-                      ],
-                      "correct_answer": "All of the above",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "What is the specialization related to digital marketing?",
-                      "options": [
-                          "Digital Marketing Management",
-                          "Marketing Management",
-                          "Sales Management",
-                          "Retail Management"
-                      ],
-                      "correct_answer": "Digital Marketing Management",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "Which specialization focuses on finance?",
-                      "options": [
-                          "Finance Management",
-                          "Accounting Management",
-                          "Banking Management",
-                          "Financial Planning"
-                      ],
-                      "correct_answer": "Finance Management",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "What is the specialization related to supply chain and logistics?",
-                      "options": [
-                          "Logistics and Supply Chain Management",
-                          "Operations Management",
-                          "Project Management",
-                          "Production Management"
-                      ],
-                      "correct_answer": "Logistics and Supply Chain Management",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "Which specialization combines data science and business analytics?",
-                      "options": [
-                          "Data Science and Business Analytics",
-                          "Business Analytics",
-                          "Data Science",
-                          "Data Management"
-                      ],
-                      "correct_answer": "Data Science and Business Analytics",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "What is the specialization focused on international business?",
-                      "options": [
-                          "International Business Management",
-                          "Global Business Management",
-                          "Export-Import Management",
-                          "Foreign Trade Management"
-                      ],
-                      "correct_answer": "International Business Management",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "Which specialization is related to starting and running a business?",
-                      "options": [
-                          "Entrepreneurship Management",
-                          "Business Management",
-                          "Management Studies",
-                          "Business Administration"
-                      ],
-                      "correct_answer": "Entrepreneurship Management",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "What is the specialization focused on managing events?",
-                      "options": [
-                          "Event Management",
-                          "Event Planning",
-                          "Event Organizing",
-                          "Event Marketing"
-                      ],
-                      "correct_answer": "Event Management",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "Which specialization is related to retail operations?",
-                      "options": [
-                          "Retail Management",
-                          "Retail Operations",
-                          "Retail Marketing",
-                          "Retail Sales"
-                      ],
-                      "correct_answer": "Retail Management",
-                      "marks": 1.2,
-                      "is_active": true
-                  },
-                  {
-                      "question": "How many specializations are offered in the MBA program?",
-                      "options": [
-                          "8",
-                          "10",
-                          "11",
-                          "12"
-                      ],
-                      "correct_answer": "11",
-                      "marks": 1.2,
-                      "is_active": true
-                  }
-              ],
-              "is_active": true
-          }
-      ]
-  }
-}
-const quizData = JSON.parse(localStorage.getItem("quizData"));
-const initialData = transformQuizData(quizData);
-console.log(initialData);
-
-
-// Calculate total marks
-initialData.totalMarks = initialData.sections.reduce(
-  (total, section) =>
-    total +
-    section.questions.reduce((sum, q) => sum + Number(q.score || 0), 0),
-  0
-);
+            question: "How many deemed universities has D.Y. Patil envisioned?",
+            options: ["1", "2", "3", "4"],
+            correct_answer: "3",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question:
+              "What was the purpose of establishing the Centre of Online Learning (COL)?",
+            options: [
+              "To bridge the gap between industry expectations and student skills",
+              "To promote online education",
+              "To offer more courses",
+              "To increase enrollment",
+            ],
+            correct_answer:
+              "To bridge the gap between industry expectations and student skills",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question: "What is D.Y. Patil's principle for success in life?",
+            options: [
+              "Follow your passion",
+              "Work hard",
+              "Ego is the death of life",
+              "Never give up",
+            ],
+            correct_answer: "Ego is the death of life",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question: "From which town in Maharashtra is D.Y. Patil?",
+            options: ["Kolhapur", "Pune", "Mumbai", "Nagpur"],
+            correct_answer: "Kolhapur",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question:
+              "How many independent institutions has D.Y. Patil envisioned?",
+            options: ["100", "150", "200", "250"],
+            correct_answer: "150",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question: "What was D.Y. Patil's goal?",
+            options: [
+              "To spread education across India",
+              "To promote business",
+              "To promote agriculture",
+              "To promote tourism",
+            ],
+            correct_answer: "To spread education across India",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question: "What is D.Y. Patil's profession?",
+            options: [
+              "Educationist",
+              "Businessman",
+              "Politician",
+              "Agriculturist",
+            ],
+            correct_answer: "Educationist",
+            marks: 1.2,
+            is_active: true,
+          },
+        ],
+        is_active: true,
+      },
+      {
+        title: "MBA Overview",
+        questions: [
+          {
+            question: "What is the duration of the MBA program?",
+            options: ["1 year", "2 years", "3 years", "4 years"],
+            correct_answer: "2 years",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question:
+              "How many specializations are offered in the MBA program?",
+            options: ["8", "10", "11", "12"],
+            correct_answer: "11",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question: "What is the mode of instruction for the MBA program?",
+            options: ["Online", "Offline", "Hybrid", "Both online and offline"],
+            correct_answer: "Online",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question:
+              "How many live masterclasses are included in the MBA program?",
+            options: ["1", "2", "3", "4"],
+            correct_answer: "1",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question: "What is the learning approach of the MBA program?",
+            options: [
+              "Flexible learning",
+              "Rigid learning",
+              "Self-paced learning",
+              "Classroom learning",
+            ],
+            correct_answer: "Flexible learning",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question: "What is the adherence of the MBA program?",
+            options: [
+              "4 Quadrants of UGC",
+              "3 Quadrants of UGC",
+              "2 Quadrants of UGC",
+              "5 Quadrants of UGC",
+            ],
+            correct_answer: "4 Quadrants of UGC",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question:
+              "Which of the following is a highlight of the MBA program?",
+            options: [
+              "Placement assistance",
+              "Cutting-edge curriculum",
+              "Industry connect",
+              "All of the above",
+            ],
+            correct_answer: "All of the above",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question: "What is the focus of the MBA program?",
+            options: [
+              "Business case studies",
+              "Real-world examples",
+              "Both business case studies and real-world examples",
+              "None of the above",
+            ],
+            correct_answer:
+              "Both business case studies and real-world examples",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question: "Who designed the MBA program?",
+            options: [
+              "Business professionals",
+              "Academicians",
+              "Both business professionals and academicians",
+              "None of the above",
+            ],
+            correct_answer: "Both business professionals and academicians",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question: "What is the purpose of the MBA program?",
+            options: [
+              "To bridge the gap between industry expectations and student skills",
+              "To provide theoretical knowledge",
+              "To promote online education",
+              "To increase enrollment",
+            ],
+            correct_answer:
+              "To bridge the gap between industry expectations and student skills",
+            marks: 1.2,
+            is_active: true,
+          },
+        ],
+        is_active: true,
+      },
+      {
+        title: "Why D.Y. Patil?",
+        questions: [
+          {
+            question:
+              "What is one of the advantages of studying at D.Y. Patil University?",
+            options: [
+              "Flexible learning",
+              "Limited course options",
+              "Rigid learning schedule",
+              "No industry connect",
+            ],
+            correct_answer: "Flexible learning",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question: "What is offered at D.Y. Patil University?",
+            options: [
+              "A wide range of courses across multiple disciplines",
+              "Limited course options",
+              "Only MBA courses",
+              "Only engineering courses",
+            ],
+            correct_answer:
+              "A wide range of courses across multiple disciplines",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question:
+              "How is the virtual classroom experience at D.Y. Patil University?",
+            options: [
+              "Interactive",
+              "Boring",
+              "One-way communication",
+              "No virtual classroom",
+            ],
+            correct_answer: "Interactive",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question: "Who teaches at D.Y. Patil University?",
+            options: [
+              "Distinguished faculty members and industry experts",
+              "Inexperienced faculty",
+              "Only industry experts",
+              "Only faculty members",
+            ],
+            correct_answer:
+              "Distinguished faculty members and industry experts",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question:
+              "What kind of support services are provided at D.Y. Patil University?",
+            options: [
+              "Comprehensive support services",
+              "Limited support services",
+              "No support services",
+              "Only academic support services",
+            ],
+            correct_answer: "Comprehensive support services",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question: "How are exams conducted at D.Y. Patil University?",
+            options: [
+              "Online exams from any location with internet access",
+              "Only on-campus exams",
+              "No exams",
+              "Both online and on-campus exams",
+            ],
+            correct_answer:
+              "Online exams from any location with internet access",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question: "What is the learning approach at D.Y. Patil University?",
+            options: [
+              "Flexible learning",
+              "Rigid learning schedule",
+              "Self-paced learning",
+              "Classroom learning",
+            ],
+            correct_answer: "Flexible learning",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question:
+              "What is the purpose of the dedicated relationship officers at D.Y. Patil University?",
+            options: [
+              "To provide personalized support throughout the journey",
+              "To handle admissions",
+              "To teach courses",
+              "To conduct exams",
+            ],
+            correct_answer:
+              "To provide personalized support throughout the journey",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question:
+              "What is the advantage of the virtual classroom environment at D.Y. Patil University?",
+            options: [
+              "Interactive and engaging",
+              "Boring and one-way communication",
+              "No virtual classroom",
+              "Limited interaction",
+            ],
+            correct_answer: "Interactive and engaging",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question:
+              "What is the advantage of the faculty at D.Y. Patil University?",
+            options: [
+              "Distinguished and experienced",
+              "Inexperienced",
+              "Only industry experts",
+              "Only academicians",
+            ],
+            correct_answer: "Distinguished and experienced",
+            marks: 1.2,
+            is_active: true,
+          },
+        ],
+        is_active: true,
+      },
+      {
+        title: "MBA Specializations",
+        questions: [
+          {
+            question:
+              "Which of the following is a specialization offered in the MBA program?",
+            options: [
+              "Sales and Marketing Management",
+              "Human Resource Management",
+              "Hospital and Healthcare Management",
+              "All of the above",
+            ],
+            correct_answer: "All of the above",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question:
+              "What is the specialization related to digital marketing?",
+            options: [
+              "Digital Marketing Management",
+              "Marketing Management",
+              "Sales Management",
+              "Retail Management",
+            ],
+            correct_answer: "Digital Marketing Management",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question: "Which specialization focuses on finance?",
+            options: [
+              "Finance Management",
+              "Accounting Management",
+              "Banking Management",
+              "Financial Planning",
+            ],
+            correct_answer: "Finance Management",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question:
+              "What is the specialization related to supply chain and logistics?",
+            options: [
+              "Logistics and Supply Chain Management",
+              "Operations Management",
+              "Project Management",
+              "Production Management",
+            ],
+            correct_answer: "Logistics and Supply Chain Management",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question:
+              "Which specialization combines data science and business analytics?",
+            options: [
+              "Data Science and Business Analytics",
+              "Business Analytics",
+              "Data Science",
+              "Data Management",
+            ],
+            correct_answer: "Data Science and Business Analytics",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question:
+              "What is the specialization focused on international business?",
+            options: [
+              "International Business Management",
+              "Global Business Management",
+              "Export-Import Management",
+              "Foreign Trade Management",
+            ],
+            correct_answer: "International Business Management",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question:
+              "Which specialization is related to starting and running a business?",
+            options: [
+              "Entrepreneurship Management",
+              "Business Management",
+              "Management Studies",
+              "Business Administration",
+            ],
+            correct_answer: "Entrepreneurship Management",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question: "What is the specialization focused on managing events?",
+            options: [
+              "Event Management",
+              "Event Planning",
+              "Event Organizing",
+              "Event Marketing",
+            ],
+            correct_answer: "Event Management",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question: "Which specialization is related to retail operations?",
+            options: [
+              "Retail Management",
+              "Retail Operations",
+              "Retail Marketing",
+              "Retail Sales",
+            ],
+            correct_answer: "Retail Management",
+            marks: 1.2,
+            is_active: true,
+          },
+          {
+            question:
+              "How many specializations are offered in the MBA program?",
+            options: ["8", "10", "11", "12"],
+            correct_answer: "11",
+            marks: 1.2,
+            is_active: true,
+          },
+        ],
+        is_active: true,
+      },
+    ],
+  },
+};
 
 export default function QuizPreview() {
-  const [quizData, setQuizData] = useState(initialData);
+  const [quizData, setQuizData] = useState({});
   const [selectedTab, setSelectedTab] = useState(0);
   const [editing, setEditing] = useState({});
-  const [deleteDialog, setDeleteDialog] = useState({ open: false, index: null });
+  const [deleteDialog, setDeleteDialog] = useState({
+    open: false,
+    index: null,
+  });
   const [draft, setDraft] = useState({});
+  
+  useEffect(() => {
+    const localQuizData = JSON.parse(localStorage.getItem("quizData")) || {};
 
-  const navigate= useNavigate();
+    const initialData = transformQuizData(localQuizData) || {};
+    console.log(initialData);
+
+    // Calculate total marks
+    initialData.totalMarks = initialData?.sections?.reduce(
+      (total, section) =>
+        total +
+        section?.questions?.reduce((sum, q) => sum + Number(q.score || 0), 0),
+      0
+    );
+    setQuizData(initialData);
+  }, []);
+
+  const navigate = useNavigate();
   // Toggle edit mode for a field key with save behavior
   const toggleSaveField = (key, updateFn) => {
     if (editing[key]) {
@@ -909,7 +609,8 @@ export default function QuizPreview() {
     if (field === "score") {
       updatedQuiz.totalMarks = updatedQuiz.sections.reduce(
         (total, sec) =>
-          total + sec.questions.reduce((sum, q) => sum + Number(q.score || 0), 0),
+          total +
+          sec.questions.reduce((sum, q) => sum + Number(q.score || 0), 0),
         0
       );
     }
@@ -954,7 +655,8 @@ export default function QuizPreview() {
       updatedQuiz.sections[sectionIdx].questions.splice(questionIdx, 1);
       updatedQuiz.totalMarks = updatedQuiz.sections.reduce(
         (total, sec) =>
-          total + sec.questions.reduce((sum, q) => sum + Number(q.score || 0), 0),
+          total +
+          sec.questions.reduce((sum, q) => sum + Number(q.score || 0), 0),
         0
       );
       setQuizData(updatedQuiz);
@@ -998,7 +700,6 @@ export default function QuizPreview() {
             textAlign: "center",
             fontSize: "25px",
             fontWeight: "900",
-       
           }}
         />
         {/* <IconButton
@@ -1016,7 +717,7 @@ export default function QuizPreview() {
         {/* Right Container: Total Marks + Publish Button */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <Typography variant="h6" sx={{ fontWeight: "bold", color: "#333" }}>
-            Total Marks: {quizData.totalMarks.toFixed(0)}
+            Total Marks: {quizData?.totalMarks?.toFixed(0)}
           </Typography>
           <Button
             variant="contained"
@@ -1067,7 +768,7 @@ export default function QuizPreview() {
                 },
               }}
             >
-              {quizData.sections.map((section, index) => (
+              {quizData?.sections?.map((section, index) => (
                 <Tab
                   key={index}
                   label={
@@ -1076,7 +777,10 @@ export default function QuizPreview() {
                         <TextField
                           value={draft[`section-${index}`] ?? section.name}
                           onChange={(e) =>
-                            handleDraftChange(`section-${index}`, e.target.value)
+                            handleDraftChange(
+                              `section-${index}`,
+                              e.target.value
+                            )
                           }
                           onBlur={() =>
                             toggleSaveField(`section-${index}`, (newVal) =>
@@ -1094,14 +798,16 @@ export default function QuizPreview() {
                               ...prev,
                               [`section-${index}`]: section.name,
                             }));
-                            setEditing((prev) => ({ ...prev, [`section-${index}`]: true }));
+                            setEditing((prev) => ({
+                              ...prev,
+                              [`section-${index}`]: true,
+                            }));
                           }}
                           sx={{ cursor: "pointer" }}
                         >
                           {section.name}
                         </Typography>
                       )}
-                      
                     </Box>
                   }
                 />
@@ -1120,7 +826,7 @@ export default function QuizPreview() {
               maxHeight: "calc(100vh - 100px)",
             }}
           >
-            {quizData.sections[selectedTab]?.questions.map(
+            {quizData?.sections?.[selectedTab]?.questions?.map(
               (question, questionIdx) => (
                 <Card
                   key={questionIdx}
@@ -1145,15 +851,25 @@ export default function QuizPreview() {
                         }
                         onChange={(e) => {
                           if (editing[`q-${selectedTab}-${questionIdx}`]) {
-                            handleDraftChange(`q-${selectedTab}-${questionIdx}`, e.target.value);
+                            handleDraftChange(
+                              `q-${selectedTab}-${questionIdx}`,
+                              e.target.value
+                            );
                           }
                         }}
                         sx={{ backgroundColor: "#fff", borderRadius: 2 }}
                       />
                       <IconButton
                         onClick={() =>
-                          toggleSaveField(`q-${selectedTab}-${questionIdx}`, (newVal) =>
-                            updateQuestionField(selectedTab, questionIdx, "question", newVal)
+                          toggleSaveField(
+                            `q-${selectedTab}-${questionIdx}`,
+                            (newVal) =>
+                              updateQuestionField(
+                                selectedTab,
+                                questionIdx,
+                                "question",
+                                newVal
+                              )
                           )
                         }
                         size="small"
@@ -1165,7 +881,9 @@ export default function QuizPreview() {
                         )}
                       </IconButton>
                       <IconButton
-                        onClick={() => handleDeleteQuestion(selectedTab, questionIdx)}
+                        onClick={() =>
+                          handleDeleteQuestion(selectedTab, questionIdx)
+                        }
                         size="small"
                       >
                         <Delete color="error" fontSize="small" />
@@ -1175,7 +893,7 @@ export default function QuizPreview() {
                     <Divider sx={{ my: 1 }} />
 
                     {/* Options */}
-                    {question.options.map((option, optIdx) => (
+                    {question?.options?.map((option, optIdx) => (
                       <Box
                         key={optIdx}
                         display="flex"
@@ -1183,7 +901,9 @@ export default function QuizPreview() {
                         mb={1}
                         sx={{
                           backgroundColor:
-                            question.correctAnswer === option ? "#f1f8e9" : "#fff",
+                            question.correctAnswer === option
+                              ? "#f1f8e9"
+                              : "#fff",
                           border:
                             question.correctAnswer === option
                               ? "2px solid #8bc34a"
@@ -1196,14 +916,24 @@ export default function QuizPreview() {
                           fullWidth
                           variant="outlined"
                           value={
-                            editing[`opt-${selectedTab}-${questionIdx}-${optIdx}`]
-                              ? draft[`opt-${selectedTab}-${questionIdx}-${optIdx}`] ??
-                                option
+                            editing[
+                              `opt-${selectedTab}-${questionIdx}-${optIdx}`
+                            ]
+                              ? draft[
+                                  `opt-${selectedTab}-${questionIdx}-${optIdx}`
+                                ] ?? option
                               : option
                           }
                           onChange={(e) => {
-                            if (editing[`opt-${selectedTab}-${questionIdx}-${optIdx}`]) {
-                              handleDraftChange(`opt-${selectedTab}-${questionIdx}-${optIdx}`, e.target.value);
+                            if (
+                              editing[
+                                `opt-${selectedTab}-${questionIdx}-${optIdx}`
+                              ]
+                            ) {
+                              handleDraftChange(
+                                `opt-${selectedTab}-${questionIdx}-${optIdx}`,
+                                e.target.value
+                              );
                             }
                           }}
                           sx={{
@@ -1214,15 +944,25 @@ export default function QuizPreview() {
                         />
                         <IconButton
                           onClick={() =>
-                            toggleSaveField(`opt-${selectedTab}-${questionIdx}-${optIdx}`, (newVal) => {
-                              const updatedOptions = [...question.options];
-                              updatedOptions[optIdx] = newVal;
-                              updateQuestionField(selectedTab, questionIdx, "options", updatedOptions);
-                            })
+                            toggleSaveField(
+                              `opt-${selectedTab}-${questionIdx}-${optIdx}`,
+                              (newVal) => {
+                                const updatedOptions = [...question.options];
+                                updatedOptions[optIdx] = newVal;
+                                updateQuestionField(
+                                  selectedTab,
+                                  questionIdx,
+                                  "options",
+                                  updatedOptions
+                                );
+                              }
+                            )
                           }
                           size="small"
                         >
-                          {editing[`opt-${selectedTab}-${questionIdx}-${optIdx}`] ? (
+                          {editing[
+                            `opt-${selectedTab}-${questionIdx}-${optIdx}`
+                          ] ? (
                             <Check color="success" fontSize="small" />
                           ) : (
                             <EditOutlined fontSize="small" />
@@ -1233,7 +973,15 @@ export default function QuizPreview() {
 
                     {/* Score */}
                     <Box display="flex" alignItems="center" mt={1}>
-                      <Typography variant="body1" sx={{ fontWeight: "bold", mr: 1, fontSize: "0.9rem", color: "#333" }}>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontWeight: "bold",
+                          mr: 1,
+                          fontSize: "0.9rem",
+                          color: "#333",
+                        }}
+                      >
                         Score:
                       </Typography>
                       <TextField
@@ -1247,15 +995,30 @@ export default function QuizPreview() {
                         }
                         onChange={(e) => {
                           if (editing[`score-${selectedTab}-${questionIdx}`]) {
-                            handleDraftChange(`score-${selectedTab}-${questionIdx}`, e.target.value);
+                            handleDraftChange(
+                              `score-${selectedTab}-${questionIdx}`,
+                              e.target.value
+                            );
                           }
                         }}
-                        sx={{ width: 100, backgroundColor: "#fff", borderRadius: 2, fontSize: "0.9rem" }}
+                        sx={{
+                          width: 100,
+                          backgroundColor: "#fff",
+                          borderRadius: 2,
+                          fontSize: "0.9rem",
+                        }}
                       />
                       <IconButton
                         onClick={() =>
-                          toggleSaveField(`score-${selectedTab}-${questionIdx}`, (newVal) =>
-                            updateQuestionField(selectedTab, questionIdx, "score", newVal)
+                          toggleSaveField(
+                            `score-${selectedTab}-${questionIdx}`,
+                            (newVal) =>
+                              updateQuestionField(
+                                selectedTab,
+                                questionIdx,
+                                "score",
+                                newVal
+                              )
                           )
                         }
                         size="small"
@@ -1276,7 +1039,10 @@ export default function QuizPreview() {
       </Box>
 
       {/* Delete Section Confirmation Dialog */}
-      <Dialog open={deleteDialog.open} onClose={() => setDeleteDialog({ open: false, index: null })}>
+      <Dialog
+        open={deleteDialog.open}
+        onClose={() => setDeleteDialog({ open: false, index: null })}
+      >
         <DialogTitle>Are you sure you want to delete this section?</DialogTitle>
         <DialogActions>
           <Button onClick={() => setDeleteDialog({ open: false, index: null })}>
