@@ -13,7 +13,7 @@ function App() {
     v7_relativeSplatPath: true,
   }}
     >
-     <Toaster position="top-right" reverseOrder={false} />
+     <Toaster position="bottom-center" reverseOrder={false} />
       <div className="App">
         <Routes>
           {/* Only one route, because we're handling scrolling via react-scroll */}

@@ -36,7 +36,6 @@ const QuizGenerator = () => {
   const [Loading, setLoading] = useState(false);
   const [error, setError] = useState({});
   const [responseData, setResponseData] = useState(null);
-  const [Apierror, setApiError] = useState(null);
   const navigate = useNavigate();
 
   const validFormats = [
@@ -47,6 +46,7 @@ const QuizGenerator = () => {
   ];
 
   const handleFileUpload = (uploadedFile) => {
+  
     if (!uploadedFile) return;
     let errors = {};
     if (!validFormats.includes(uploadedFile.type)) {
@@ -125,27 +125,63 @@ const QuizGenerator = () => {
  const handleSubmit = async() => {
     if (!validateInput()) return;
     setLoading(true);
-    toast.success("✅ Quiz data collected! Redirecting to preview...");
-    setTimeout(() => navigate("/quiz-preview", { state: formData }), 15000);
-
+    const timestamp = Date.now();
+    const fileSplit = file.name.split('.');
     try {
       const response = await axios.post(
         "https://hy4s0t7gyl.execute-api.us-east-1.amazonaws.com/default/quadragen_quizGenerate",
         {
-          courseFile: "quadragen-content-files/content/course4_1234567893.pdf",
-          numSections: 30,
-          questionsPerSection: 5,
-          marksPerQuestion: 10,
+          courseFile: `quadragen-content-files/content/${fileSplit[0]}_${timestamp}.${fileSplit[1]}`,
+          numSections: formData?.sections,
+          questionsPerSection: formData?.questions,
+          difficulty: formData?.difficulty,
+          totalMarks:formData?.totalMarks,
         },
         {
           headers: { "Content-Type": "application/json" },
         }
       );
+      if(response?.data){
       setResponseData(response.data);
-      setApiError(null);
+      toast.success("Great! Taking you to the Quiz Preview", {
+        style: {
+      background: "#E6F4EA", // Light green background
+      color: "#1E4620", // Dark green text for contrast
+      padding: "12px 20px",
+      borderRadius: "8px",
+      border: "1px solid #A3D9A5", // Green border for a soft look
+      boxShadow: "0px 4px 10px rgba(163, 217, 165, 0.5)", // Subtle glow
+    },
+      });
+     navigate("/quiz-preview", { state: response.data });
+    }
+    else{
+      toast.error(`${response.data.error||"Failed to Generate Quiz.Please try again "}`, {
+        style: {
+          background: "#FDEDED", // Light red background
+          color: "#611A15", // Dark red text for contrast
+          padding: "12px 20px",
+          borderRadius: "8px",
+          border: "1px solid #F5C6C7", // Red border for a soft look
+          boxShadow: "0px 4px 10px rgba(245, 198, 199, 0.5)", // Subtle glow
+        },
+      });
+    }
     } catch (err) {
       setError(err);
-      setApiError(null);
+      toast.error(`${err ||"Failed to Generate Quiz.Please try again "}`, {
+        style: {
+          background: "#FDEDED", // Light red background
+          color: "#611A15", // Dark red text for contrast
+          padding: "12px 20px",
+          borderRadius: "8px",
+          border: "1px solid #F5C6C7", // Red border for a soft look
+          boxShadow: "0px 4px 10px rgba(245, 198, 199, 0.5)", // Subtle glow
+        },
+      });
+      
+    }finally{
+      setLoading(false);
     }
   };
   const handleBackToUpload = () => {
