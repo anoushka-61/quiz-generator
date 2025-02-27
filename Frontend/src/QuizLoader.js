@@ -4,12 +4,23 @@ import SmartToyIcon from "@mui/icons-material/SmartToy"; // AI Icon
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 const loadingMessages = [
-  "Generating AI-powered quiz...",
+ "Generating AI-powered quiz...",
   "Analyzing content for optimal questions...",
   "Fine-tuning difficulty for accuracy...",
+  "Enhancing question clarity and relevance...",
+  "Finalizing quiz structure for the best experience...",
 ];
+const uploadingFileMessages = [
+  "Uploading your file...",
+  "Encrypting file data...",
+  "Verifying file integrity...",
+  "Transmitting data securely...",
+  "Storing file safely...",
+  "Finalizing file upload...",
+  "Completing the process..."
+]
 
-const QuizLoader = ({ open }) => {
+const QuizLoader = ({ open,uploadingFile }) => {
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
 
   useEffect(() => {
@@ -52,7 +63,7 @@ const QuizLoader = ({ open }) => {
           variant="body1"
           sx={{ fontWeight: "bold", color: "#2C3E50" }}
         >
-          {loadingMessages[currentMessageIndex]}
+          {uploadingFile?uploadingFileMessages[currentMessageIndex]:loadingMessages[currentMessageIndex]}
         </Typography>
       </Box>
     </Modal>

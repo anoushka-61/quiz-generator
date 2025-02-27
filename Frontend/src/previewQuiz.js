@@ -21,6 +21,7 @@ import {
   Delete,
   Publish,
 } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
 const initialData = {
   title: "My Quiz Title",
@@ -325,6 +326,7 @@ export default function QuizPreview() {
   const [deleteDialog, setDeleteDialog] = useState({ open: false, index: null });
   const [draft, setDraft] = useState({});
 
+  const navigate= useNavigate();
   // Toggle edit mode for a field key with save behavior
   const toggleSaveField = (key, updateFn) => {
     if (editing[key]) {
@@ -422,7 +424,7 @@ export default function QuizPreview() {
         }}
       >
         {/* Back Icon */}
-        <IconButton>
+        <IconButton onClick={() => navigate(-1)}>
           <ArrowBack />
         </IconButton>
 

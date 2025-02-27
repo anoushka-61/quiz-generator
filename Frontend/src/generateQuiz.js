@@ -23,7 +23,17 @@ import { useNavigate } from "react-router-dom";
 import QuizLoader from "./QuizLoader";
 import { Sparkles } from "lucide-react"; // Using lucide-react for the icon
 import axios from "axios";
+import AWS from 'aws-sdk';
+
+AWS.config.update({
+  accessKeyId: process.env.REACT_APP_ACCESS_KEY_ID, 
+  secretAccessKey: process.env.REACT_APP_SECRET_ACCESS_KEY, 
+  region: 'us-east-1', // Adjust the region if needed
+});
+
+const s3 = new AWS.S3();
 const QuizGenerator = () => {
+  console.log({pr:process.env.REACT_APP_ACCESS_KEY_ID,})
   const [file, setFile] = useState(null);
   const [dragging, setDragging] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -34,8 +44,13 @@ const QuizGenerator = () => {
     totalMarks: "",
   });
   const [Loading, setLoading] = useState(false);
+  console.log({ Loading})
   const [error, setError] = useState({});
   const [responseData, setResponseData] = useState(null);
+ 
+  const [responseFile, setResponseFile] = useState(null);
+  const [fileFailure, setFileFailure] = useState(null);
+  const[uploadingFile, setUploadingFile] = useState(false);
   const navigate = useNavigate();
 
   const validFormats = [
@@ -44,10 +59,27 @@ const QuizGenerator = () => {
     "application/msword",
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   ];
+console.log({file})
+  // const handleFileUpload = (uploadedFile) => {
+  //   console.log({uploadedFile})
+  //   if (!uploadedFile) return;
+
+
+  //   let errors = {};
+  //   if (!validFormats.includes(uploadedFile.type)) {
+  //     toast.error("❌ Invalid file type! Upload PDF, MP4, or DOC.");
+  //     errors.file = "❌ Invalid file type! Upload PDF, MP4, or DOC.";
+  //     setError(errors);
+  //     return;
+  //   }
+  //   setError(errors);
+  //   setFile(uploadedFile);
+  // };
 
   const handleFileUpload = (uploadedFile) => {
   
     if (!uploadedFile) return;
+
     let errors = {};
     if (!validFormats.includes(uploadedFile.type)) {
       toast.error("❌ Invalid file type! Upload PDF, MP4, or DOC.");
@@ -55,11 +87,13 @@ const QuizGenerator = () => {
       setError(errors);
       return;
     }
-    setError(errors);
+    setError({});
     setFile(uploadedFile);
-  };
 
+    
+  };
   const handleFileChange = (e) => {
+    console.log({e})
     handleFileUpload(e.target.files[0]);
   };
 
@@ -80,7 +114,49 @@ const QuizGenerator = () => {
   };
 
   const handleNextAfterFile = () => {
-    setShowForm(true);
+    // Generate S3 key using a FE generated path for course content upload:
+    // Format: content/courseId_timestamp.ext
+    setUploadingFile(true);
+    const timestamp = Date.now();
+    const fileExtension = file.name.split('.').pop();
+    const key = `content/${"course"}_${timestamp}.${fileExtension}`;
+
+    const params = {
+      Bucket: 'quadragen-content-files',
+      Key: key,
+      Body: file,
+      ContentType: file.type,
+    };
+    setLoading(true);
+    console.log(params);
+    s3.upload(params, (err, data) => {
+      if (err) {
+        console.error('Error uploading file:', err);
+        setLoading(false);
+        toast.error("Upload failed, please try again.");
+        setResponseFile("")
+        setFileFailure(err);
+        setUploadingFile(false);
+      } else {
+        console.log('File uploaded successfully:', data.Location);
+        setLoading(false);
+        toast.success("Upload successful!",{
+            style: {
+          background: "#E6F4EA", // Light green background
+          color: "#1E4620", // Dark green text for contrast
+          padding: "12px 20px",
+          borderRadius: "8px",
+          border: "1px solid #A3D9A5", // Green border for a soft look
+          boxShadow: "0px 4px 10px rgba(163, 217, 165, 0.5)", // Subtle glow
+        },
+        });
+        setResponseFile(data);
+        setShowForm(true);
+        setUploadingFile(false);
+        // Optionally, you can use data.Location as the URL of the uploaded file.
+      }
+    });
+    
   };
 
   const validateInput = () => {
@@ -479,7 +555,7 @@ const QuizGenerator = () => {
           </CardContent>
         </Card>
       </Box>
-      {Loading && <QuizLoader open={Loading} />}
+      {Loading && <QuizLoader open={Loading} uploadingFile={uploadingFile} />}
     </Box>
   );
 };
