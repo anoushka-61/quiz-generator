@@ -392,7 +392,7 @@ export default function QuizPreview() {
     setDeleteDialog({ open: false, index: null });
     setSelectedTab(Math.max(0, selectedTab - 1));
   };
- 
+
   // Delete a question
   const handleDeleteQuestion = (sectionIdx, questionIdx) => {
     if (window.confirm("Are you sure you want to delete this question?")) {
