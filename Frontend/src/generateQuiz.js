@@ -26,13 +26,14 @@ import axios from "axios";
 import AWS from 'aws-sdk';
 
 AWS.config.update({
-  accessKeyId:"AKIATTSKGAGFDMILU77D", 
-  secretAccessKey: "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", 
+  accessKeyId: process.env.REACT_APP_ACCESS_KEY_ID, 
+  secretAccessKey: process.env.REACT_APP_SECRET_ACCESS_KEY, 
   region: 'us-east-1', // Adjust the region if needed
 });
 
 const s3 = new AWS.S3();
 const QuizGenerator = () => {
+  console.log({pr:process.env.REACT_APP_ACCESS_KEY_ID,})
   const [file, setFile] = useState(null);
   const [dragging, setDragging] = useState(false);
   const [showForm, setShowForm] = useState(false);

@@ -1,4 +1,5 @@
 import React from "react";
+import QuizPerformance from "./QuizPerformance";
 
 // Dummy Circular Progress Slider (using SVG as a placeholder)
 const CircularProgressSlider = ({ value }) => {
@@ -42,16 +43,33 @@ const CircularProgressSlider = ({ value }) => {
 // Dummy Skill Label with a linear progress bar
 const SkillLabel = ({ name, secScore, maxMarks }) => {
   const percentValue =
-    secScore && maxMarks ? (parseFloat(secScore) / parseFloat(maxMarks)) * 100 : 0;
+    secScore && maxMarks
+      ? (parseFloat(secScore) / parseFloat(maxMarks)) * 100
+      : 0;
   const roundUpValue = Math.floor(percentValue * 100) / 100;
   return (
-    <div className="skill-label">
+    <div className="skill-label" style={{ padding: "10px" }}>
       <div>
         <div>{name?.toLowerCase()}</div>
         <div>{roundUpValue}%</div>
       </div>
-      <div className="border-linear-progress" style={{ width: "100%", height: "8px", background: "#ccc", borderRadius: "4px", overflow: "hidden" }}>
-        <div style={{ width: `${roundUpValue}%`, height: "100%", background: "#2BA738" }}></div>
+      <div
+        className="border-linear-progress"
+        style={{
+          width: "100%",
+          height: "8px",
+          background: "#ccc",
+          borderRadius: "4px",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            width: `${roundUpValue}%`,
+            height: "100%",
+            background: "#2BA738",
+          }}
+        ></div>
       </div>
     </div>
   );
@@ -79,22 +97,35 @@ const ScoreCard = () => {
       <div className="score-card--head">
         <div className="score-card--head-overlay">
           <h1>Congratulations, {first_name}!</h1>
-          <p>You have successfully finished the {assessmentName}.</p>
+          <p style={{ padding: 0, margin: 0 }}>
+            You have successfully finished the {assessmentName}.
+          </p>
           <p>Welcome to the first step towards your skill enhancement!</p>
         </div>
         <img
           className="score-card--head-img"
-          src="https://via.placeholder.com/800x188"
+          src="/report-card-bg.svg"
           alt=""
+          style={{
+            background: "rgb(30 105 11 / 39%)",
+            opacity: "2.5",
+          }}
         />
       </div>
-      <div className="score-card--body">
-        <div className="skill-label-grid">
-          {skillData.section.map((v, idx) => (
+      <div
+        className="score-card--bosdy"
+        style={{
+          display: "flex",
+          padding: "10px 100px",
+          justifyContent: "space-between",
+        }}
+      >
+        <div className="skill-label-gridww" style={{ width: "50%" }}>
+          {skillData?.section?.map((v, idx) => (
             <SkillLabel key={idx} {...v} />
           ))}
         </div>
-        <div className="prg-slider-cont flexbox-center">
+        <div className="prg-slider-const flexbox-centers">
           <CircularProgressSlider value={formattedTotalPercent} />
           <div className="prg-slider-cont--label">
             Overall Score : {obtainedMarks}/{outOfMarks}
@@ -102,33 +133,89 @@ const ScoreCard = () => {
         </div>
       </div>
       <div className="score-card--foot flexbox-center">
-        <div className="info-circle">ℹ️</div>
+        {/* <div className="info-circle">ℹ️</div> */}
         <div
-          dangerouslySetInnerHTML={{
-            __html:
-              "Keep up the great work! <b>Improvement</b> is on the way.",
-          }}
-        ></div>
+        //   dangerouslySetInnerHTML={{
+        //     __html: "Keep up the great work! <b>Improvement</b> is on the way.",
+        //   }}
+        >
+      <QuizPerformance strengths={strengths} weaknesses={weaknesses} />
+        </div>
       </div>
     </div>
   );
 };
 
-// RecommendedCards Component (with dummy courses)
 const RecommendedCards = () => {
   const courses = [
-    { title: "Course 1", description: "Learn the basics of course 1." },
-    { title: "Course 2", description: "Master advanced techniques in course 2." },
-    { title: "Course 3", description: "Explore topics in course 3." },
+    {
+      title: "Course 1",
+      description: "Learn the basics of course 1 and elevate your skills.",
+      image:
+        "https://timespro.com/_next/image?url=https%3A%2F%2Ftimesproweb-static-backend-prod.s3.ap-south-1.amazonaws.com%2FEC_Banking_Pro_Web_Banner_14926ce2b5.webp&w=1080&q=75",
+    },
+    {
+      title: "Course 2",
+      description: "Master advanced techniques in course 2 and stay ahead!",
+      image:
+        "https://timespro.com/_next/image?url=https%3A%2F%2Ftimesproweb-static-backend-prod.s3.ap-south-1.amazonaws.com%2FFlagship_Programme_E_Business_and_Logistics_Strategies_Emailer_1_11zon_b4e259e3f2.webp&w=1080&q=75",
+    },
+    {
+      title: "Course 3",
+      description: "Explore topics in course 3 and boost your expertise.",
+      image:
+        "https://timespro.com/_next/image?url=https%3A%2F%2Ftimesproweb-static-backend-prod.s3.ap-south-1.amazonaws.com%2FDAV_db4b1dbd9c.webp&w=1080&q=75",
+    },
   ];
+
   return (
     <div className="recommended--cards--main">
-      <h3>Recommended Courses</h3>
-      <div className="recommended-cards">
-        {courses.map((course, idx) => (
+      <h3>
+        <img
+          src="/ai-technology.png"
+          alt="AI Icon"
+          style={{ width: "20px", height: "20px", marginRight: "8px" }}
+        />
+        AI Recommended Courses
+      </h3>
+      <p>Based on your quiz attempt</p>
+      <div className="recommended-cards" style={{boxShadow:"rgba(165, 170, 181, 0.16) 0px 3px 6px 0px;"}}>
+        {courses?.map((course, idx) => (
           <div key={idx} className="recommended-card">
+            <img
+              src={course.image}
+              alt={course.title}
+              className="recommended-card-image"
+              style={{
+                height: "190px",
+                objectFit: "cover",
+                width: "100%",
+                objectPosition: "center top",
+                borderRadius: "8px",
+              }}
+            />
             <h4>{course.title}</h4>
             <p>{course.description}</p>
+            <button
+              className="buy-now-btn"
+              style={{
+                background: "linear-gradient(135deg, #8A2BE2, #FF69B4)",
+                color: "#fff",
+                padding: "10px 16px",
+                border: "none",
+                borderRadius: "6px",
+                cursor: "pointer",
+                fontSize: "14px",
+                fontWeight: "bold",
+                marginTop: "10px",
+                transition: "0.3s",
+                width: "100%",
+              }}
+              onMouseOver={(e) => (e.target.style.backgroundColor = "#e65c00")}
+              onMouseOut={(e) => (e.target.style.backgroundColor = "#ff6600")}
+            >
+              🚀 Enroll Now & Level Up!
+            </button>
           </div>
         ))}
       </div>
@@ -136,36 +223,22 @@ const RecommendedCards = () => {
   );
 };
 
-// BookCounsellingCard Component (dummy content)
-const BookCounsellingCard = () => {
-  return (
-    <div className="counselling-card">
-      <div className="counselling-card--right">
-        <h1>
-          Advance your career journey with a <i><u>Certified Coach</u></i>
-        </h1>
-        <p>
-          Land your dream job, role, and company faster than ever with 1:1 long term mentorship.
-        </p>
-        <a href="#">Book a Free Counselling Session</a>
-      </div>
-      {/* <img
-        className="counselling-card--img"
-        src="https://via.placeholder.com/300x200"
-        alt="Counselling"
-      /> */}
-    </div>
-  );
-};
-
+const strengths = [
+    { topic: "JavaScript", percentage: 80 },
+    { topic: "React", percentage: 75 },
+  ];
+  
+  const weaknesses = [
+    { topic: "CSS", percentage: 40 },
+    { topic: "Algorithms", percentage: 30 },
+  ];
 // Report Footer Component
 const ReportFoot = () => {
   return (
     <div className="report-card--foot flexbox-center">
-      <div>Powered by </div>
+      <div>Powered by </div> &nbsp;
       <div className="tp-logo">
-        <p> Quizpro Logo</p>
-
+        <p> Quiz pro Logo</p>
       </div>
     </div>
   );
@@ -357,8 +430,8 @@ const AssessmentReportDummy = () => {
         </div> */}
         <ScoreCard />
         <RecommendedCards />
-        <BookCounsellingCard />
-        <ReportFoot />
+        {/* <BookCounsellingCard /> */}
+        {/* <ReportFoot /> */}
       </div>
     </>
   );

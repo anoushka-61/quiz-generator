@@ -7,7 +7,7 @@ import { FormControlLabel } from "@mui/material";
 import { IconButton } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import MultipleSectionsQuestions from "./MultipleSectionsQuestions";
-
+import { toast } from "react-hot-toast";
 const QuizQuestion = () => {
   const response =
   {
@@ -60,12 +60,46 @@ const QuizQuestion = () => {
     ]
   }
   
-
+  const transformQuizData = (quizData) => {
+    if (!quizData?.data?.quiz) return { sections: [] };
+  
+    return {
+      sections: quizData.data.quiz.map((quizItem, sectionIndex) => ({
+        sectionId: sectionIndex + 1, // Assigning an incremental section ID
+        sectionTitle: quizItem.title,
+        questions: quizItem.questions.map((question, questionIndex) => ({
+          questionId: sectionIndex * 100 + questionIndex + 1, // Unique ID for each question
+          questionText: question.question,
+          marks: question.marks,
+          options: question.options.map((option, optionIndex) => ({
+            optionId: String.fromCharCode(97 + optionIndex), // Converts 0 -> 'a', 1 -> 'b', etc.
+            text: option,
+            isCorrect: option === question.correct_answer, // Check if the option is correct
+          })),
+        })),
+      })),
+    };
+  };
+  
+  // Example Usage:
+  const quizData = JSON.parse(localStorage.getItem("quizData") || "{}");
+  const transformedData = transformQuizData(quizData);
+  console.log(transformedData);
+  
 
   const [selectedSection, setSelectedSection] = useState(response.sections[0]);
   const [selectedQuestion, setSelectedQuestion] = useState(selectedSection.questions[0]);
   const [selectedValue, setSelectedValue] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false); // Default section
+  
+  const [sectionIndex, setSectionIndex] = useState(0);
+  const [questionIndex, setQuestionIndex] = useState(0);
+
+  const currentSection = transformedData.sections[sectionIndex];
+  const currentQuestion = currentSection?.questions[questionIndex];
+ const totalQuestions = transformedData?.sections?.reduce((sum,section)=>sum+section.questions.length, 0)||0;
+ const currentQuestionValue = transformedData?.sections?.slice(0, sectionIndex)?.reduce((sum, sec) => sum + sec.questions.length, 0) + questionIndex + 1; // Sum previous + current index
+
   const handleChange = (index) => {
     setSelectedValue(index);
   };
@@ -74,6 +108,47 @@ const QuizQuestion = () => {
     setSelectedQuestion(section.questions[0]);
     setDrawerOpen(false);
   };
+  const isLastQuestion =
+  sectionIndex === transformedData.sections.length - 1 &&
+  questionIndex === transformedData.sections[sectionIndex].questions.length - 1;
+
+  const handleRandomQuestionSelect = (question) => {
+    console.log({ question})
+    // Find the section index where the selected question belongs
+    const newSectionIndex = transformedData?.sections.findIndex((sec) =>
+      sec.questions.some((q) => q.questionId === question.questionId)
+    );
+  
+    // Update state to reflect the selected question and section
+    if (newSectionIndex !== -1) {
+      setSectionIndex(newSectionIndex);
+      setSelectedQuestion(question);
+      setQuestionIndex(
+        transformedData.sections[newSectionIndex].questions.findIndex((q) => q.questionId === question.questionId)
+      );
+    }
+  };
+  
+  const handleNextQuestion = () => {
+    if (questionIndex < currentSection.questions.length - 1) {
+      // Move to the next question within the same section
+      setQuestionIndex((prev) => prev + 1);
+      setSelectedValue(null);
+    } else if (questionIndex === currentSection.questions.length - 1 && sectionIndex < transformedData.sections.length - 1) {
+      // Move to the next section if the current section is finished
+      setSectionIndex((prev) => prev + 1);
+      setQuestionIndex(0);
+      setSelectedValue(null);
+    } else {
+      toast.success("Quiz Completed!",{ style: {
+        background: "#E6F4EA",
+        color: "#1E4620",
+        padding: "12px 20px",
+        borderRadius: "8px",
+        border: "1px solid #A3D9A5",
+        boxShadow: "0px 4px 10px rgba(163, 217, 165, 0.5)",
+      }}); // Handle quiz completion
+    }}
   return (
     <Typography variant="div" sx ={{width:"100%", display:"flex", flexDirection:"column",justifyContent:"center",alignItems:"center"}} className="header p-6 max-w-4xl mx-auto" >
      
@@ -83,64 +158,69 @@ const QuizQuestion = () => {
       </Button>
       <div className="ml-auto flex gap-2 header-content-left">
         <Button variant="outlined" sx={{ color: "#6439BF", border:"1px solid #6439BF", "&:hover": { backgroundColor: "#f0e9ff" ,color:"#6439BF"} }}>End Quiz</Button>
-        <Button variant="contained" sx={{ backgroundColor: "#6439BF", "&:hover": { backgroundColor: "#512ea9" } }}>
-  Next →
+        <Button variant="contained" onClick={handleNextQuestion} sx={{ backgroundColor: "#6439BF", "&:hover": { backgroundColor: "#512ea9" } }}>
+        { isLastQuestion ? "Finish":"Next"} →
 </Button>
       </div>
     </Typography>
-     <Typography variant="div" sx={{display: "flex", flexDirection: "row", gap: 4, width:"100%",justifyContent: "flex-start", alignItems: "flex-start",    padding: "10px"}}>
-      <Card sx={{width: "80%", padding:"12px",borderRadius:"14px",marginTop:"20px",boxShadow :"0 4px 3px 0 #e7e8f8"}}>
-        <CardContent sx={{display: "flex", flexDirection: "row", gap: 4}}>
-        <Typography variant="div" sx={{display: "flex", flexDirection: "column", gap: 4, width:"50%",justifyContent: "left", alignItems: "flex-start"}}>
-          <div className="text-lg font-semibold mb-2" style={{fontSize:"16px", fontWeight:"bold"}}>Question 1 of 12</div>
-          <Typography variant="div" sx={{fontSize: "16px", textAlign: "left"}}>
-            You are developing an Android application and need to securely transfer a user's username from LoginActivity to UserProfileActivity. The username must not persist in memory after being transferred.
-
-            Which Action should you take?
-          </Typography>
-          
-          </Typography>
-          <Typography variant="div" sx={{display: "flex", flexDirection: "column", gap: 4, width:"50%",justifyContent: "left", alignItems: "flex-start"}}> 
-          <div className="font-semibold mt-4"  style={{fontSize:"16px", fontWeight:"bold"}}>Select Right Answer</div>
-          <Typography variant="div" sx={{display:"flex", gap:"10px",flexDirection:"column"}}  className="space-y-2 mt-2">
-          {[...Array(4)].map((_, index) => (
-        <Typography variant="div" sx={{border : "2px solid #d5d5d5" , borderRadius:"8px" , padding:"10px", marginBottom:"10px"}} key={index} className="flex items-center border p-3 rounded-md">
-          <FormControlLabel
-            control={
-              <Radio
-                checked={selectedValue === index}
-                onChange={() => handleChange(index)}
-                sx={{
-                  color: "#6439BF",
-                  '&.Mui-checked': {
-                    color: "#6439BF",
-                  },
-                }}
-              />
-            }
-            label="Bundle the username into a key-value pair and pass it"
-          />
-        </Typography>
-      ))}
-          </Typography>
-          </Typography>
-        </CardContent>
-      </Card>
-     { !drawerOpen ?<IconButton onClick={() => setDrawerOpen(true)} sx={{ color: "#000", marginLeft: "auto" }}>
-      <MenuIcon />
-    </IconButton>:  <MultipleSectionsQuestions
+    <Typography variant="div" sx={{ display: "flex", flexDirection: "row", gap: 4, width: "100%", justifyContent: "flex-start", alignItems: "flex-start", padding: "10px" ,paddingLeft:"30px",paddingRight:"10px"}}>
+        <Card sx={{ width: "80%", padding: "12px", borderRadius: "14px", marginTop: "20px", boxShadow: "0 4px 3px 0 #e7e8f8", border:"1px solid #e7e8f8 " }}>
+          <CardContent sx={{ display: "flex", flexDirection: "row", gap: 10,justifyContent:"flex-start" }}>
+            <Typography sx={{ display: "flex", flexDirection: "column", gap: 4, alignItems:"left" ,width:"60%"}}>
+            <div className="text-lg font-semibold mb-2" style={{ fontSize: "16px", fontWeight: "bold",textAlign:"left" }}>
+              Question {currentQuestionValue} of {totalQuestions}
+            </div>
+            <Typography variant="div" sx={{ fontSize: "16px", textAlign: "left" }}>
+              {currentQuestion?.questionText}
+            </Typography>
+            </Typography>
+            <Typography>
+            <div className="font-semibold mt-4" style={{ fontSize: "16px", fontWeight: "bold" }}>
+              Select the Right Answer
+            </div>
+            <Typography variant="div" sx={{ display: "flex", gap: "10px", flexDirection: "column",paddingTop:"24px" }} className="space-y-2 mt-2">
+              {currentQuestion?.options.map((option, index) => (
+                <Typography variant="div" sx={{ border: "2px solid #d5d5d5", borderRadius: "8px", padding: "10px", marginBottom: "10px" ,display:"flex", flexDirection:"row", justifyContent:"space-between", padding:"8px",width:"300px"}} key={index} className="flex items-center border p-3 rounded-md">
+                  <FormControlLabel
+                    control={
+                      <Radio
+                        checked={selectedValue === option.optionId}
+                        onChange={() => handleChange(option.optionId)}
+                        sx={{
+                          color: "#6439BF",
+                          "&.Mui-checked": {
+                            color: "#6439BF",
+                          },
+                        }}
+                      />
+                    }
+                    label={option.text}
+                  />
+                </Typography>
+              ))}
+            </Typography>
+            </Typography>
+          </CardContent>
+        </Card>
+        {!drawerOpen ? (
+          <IconButton onClick={() => setDrawerOpen(true)} sx={{ color: "#000", marginLeft: "auto", paddingRight:"20px" }}>
+            <MenuIcon />
+          </IconButton>
+        ) : (
+          <MultipleSectionsQuestions
             openQuestionPanel={drawerOpen}
             setOpenQuestionPanel={setDrawerOpen}
-            onRandonmQuestionSelect={()=>{}}
-            activeSection={response.sections[0]}
-            currentQuestionId={response.sections[0].questions[0].questionId}
-            onSubmitQuiz={()=>{}}
-            onSubmitSection={()=>{}}
-            QuizSections={response.sections}
-            // multiSectionQuizQuestions={response.sections[0].questions}
-          />}
-</Typography> 
-    
+            onRandomQuestionSelect={handleRandomQuestionSelect}
+            activeSection={currentSection}
+            currentQuestionId={currentQuestion?.questionId}
+            onSubmitQuiz={() => {}}
+            onSubmitSection={() => {}}
+            QuizSections={transformedData.sections}
+            transformedData={transformedData}
+            currentSectionId={sectionIndex}
+          />
+        )}
+      </Typography>
     </Typography>
   );
 };
