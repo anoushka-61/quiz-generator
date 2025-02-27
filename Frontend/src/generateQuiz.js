@@ -47,10 +47,10 @@ const QuizGenerator = () => {
   console.log({ Loading})
   const [error, setError] = useState({});
   const [responseData, setResponseData] = useState(null);
- 
   const [responseFile, setResponseFile] = useState(null);
   const [fileFailure, setFileFailure] = useState(null);
   const[uploadingFile, setUploadingFile] = useState(false);
+  const [fileKey, setFileKey] = useState(null);
   const navigate = useNavigate();
 
   const validFormats = [
@@ -77,7 +77,7 @@ console.log({file})
   // };
 
   const handleFileUpload = (uploadedFile) => {
-  
+  localStorage.removeItem("quizData");
     if (!uploadedFile) return;
 
     let errors = {};
@@ -118,8 +118,9 @@ console.log({file})
     // Format: content/courseId_timestamp.ext
     setUploadingFile(true);
     const timestamp = Date.now();
-    const fileExtension = file.name.split('.').pop();
-    const key = `content/${"course"}_${timestamp}.${fileExtension}`;
+    const fileSplit = file.name.split('.');
+    const key = `content/${fileSplit[0]}_${timestamp}.${fileSplit[1]}`;
+    setFileKey(key);
 
     const params = {
       Bucket: 'quadragen-content-files',
@@ -198,68 +199,93 @@ console.log({file})
     return Object.keys(errors).length === 0;
   };
 
- const handleSubmit = async() => {
+
+
+
+  const handleSubmit = async () => {
     if (!validateInput()) return;
     setLoading(true);
-    const timestamp = Date.now();
-    const fileSplit = file.name.split('.');
     try {
       const response = await axios.post(
         "https://hy4s0t7gyl.execute-api.us-east-1.amazonaws.com/default/quadragen_quizGenerate",
         {
-          courseFile: `quadragen-content-files/content/${fileSplit[0]}_${timestamp}.${fileSplit[1]}`,
-          numSections: formData?.sections,
-          questionsPerSection: formData?.questions,
-          difficulty: formData?.difficulty,
-          totalMarks:formData?.totalMarks,
+          courseFile: `quadragen-content-files/${fileKey}`,
+          numSections: formData.sections,
+          questionsPerSection: formData.questions,
+          difficulty: formData.difficulty,
+          totalMarks: formData.totalMarks,
         },
         {
           headers: { "Content-Type": "application/json" },
         }
       );
-      if(response?.data){
-      setResponseData(response.data);
-      toast.success("Great! Taking you to the Quiz Preview", {
-        style: {
-      background: "#E6F4EA", // Light green background
-      color: "#1E4620", // Dark green text for contrast
-      padding: "12px 20px",
-      borderRadius: "8px",
-      border: "1px solid #A3D9A5", // Green border for a soft look
-      boxShadow: "0px 4px 10px rgba(163, 217, 165, 0.5)", // Subtle glow
-    },
-      });
-     navigate("/quiz-preview", { state: response.data });
-    }
-    else{
-      toast.error(`${response.data.error||"Failed to Generate Quiz.Please try again "}`, {
-        style: {
-          background: "#FDEDED", // Light red background
-          color: "#611A15", // Dark red text for contrast
-          padding: "12px 20px",
-          borderRadius: "8px",
-          border: "1px solid #F5C6C7", // Red border for a soft look
-          boxShadow: "0px 4px 10px rgba(245, 198, 199, 0.5)", // Subtle glow
-        },
-      });
-    }
+      if (response?.data) {
+        setResponseData(response.data);
+        toast.success("Quiz generation initiated. Please wait...", {
+          style: {
+            background: "#E6F4EA",
+            color: "#1E4620",
+            padding: "12px 20px",
+            borderRadius: "8px",
+            border: "1px solid #A3D9A5",
+            boxShadow: "0px 4px 10px rgba(163, 217, 165, 0.5)",
+          },
+        });
+        localStorage.setItem("quizData", JSON.stringify(response.data));
+        navigate("/quiz-preview", { state: response.data });
+        // In success scenario, call GET API immediately.
+        // await fetchQuizData();
+      } else {
+        toast.error(
+          `${response.data.error || "Failed to generate quiz. Please try again"}`,
+          {
+            style: {
+              background: "#FDEDED",
+              color: "#611A15",
+              padding: "12px 20px",
+              borderRadius: "8px",
+              border: "1px solid #F5C6C7",
+              boxShadow: "0px 4px 10px rgba(245, 198, 199, 0.5)",
+            },
+          }
+        );
+        // On failure, wait for 2 minutes before calling GET API.
+        setTimeout(fetchQuizData, 120000);
+      }
     } catch (err) {
       setError(err);
-      toast.error(`${err ||"Failed to Generate Quiz.Please try again "}`, {
+      toast.error(`${err || "Failed to generate quiz. Please try again"}`, {
         style: {
-          background: "#FDEDED", // Light red background
-          color: "#611A15", // Dark red text for contrast
+          background: "#FDEDED",
+          color: "#611A15",
           padding: "12px 20px",
           borderRadius: "8px",
-          border: "1px solid #F5C6C7", // Red border for a soft look
-          boxShadow: "0px 4px 10px rgba(245, 198, 199, 0.5)", // Subtle glow
+          border: "1px solid #F5C6C7",
+          boxShadow: "0px 4px 10px rgba(245, 198, 199, 0.5)",
         },
       });
-      
-    }finally{
+      // On error, wait for 2 minutes before calling GET API.
+      setTimeout(fetchQuizData, 120000);
+    }
+    // Note: setLoading(false) is handled in fetchQuizData's finally block.
+  };
+
+  const fetchQuizData = async () => {
+    try {
+      const courseId = fileKey ? fileKey.split("/")[1].replace(/\.[^/.]+$/, "") : "";
+      const getResponse = await axios.get(
+        `https://hojir3vx1i.execute-api.us-east-1.amazonaws.com/default/quadragen-getQuizById?courseId=${courseId}`
+      );
+      localStorage.setItem("quizData", JSON.stringify(getResponse.data));
+      navigate("/quiz-preview", { state: getResponse.data });
+    } catch (err) {
+      console.error("Error fetching quiz data:", err);
+      toast.error("Failed to fetch quiz data. Please try again later.");
+    } finally {
       setLoading(false);
     }
   };
+
   const handleBackToUpload = () => {
     setShowForm(false);
   };

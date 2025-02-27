@@ -23,7 +23,7 @@ import {
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 
-const initialData = {
+const initialDatsa = {
   title: "My Quiz Title",
   totalMarks: 0,
   sections: [
@@ -311,6 +311,558 @@ const initialData = {
   ],
 };
 
+function transformQuizData(apiData) {
+  // Destructure the quiz array from the API data
+  const { quiz } = apiData.data;
+  let totalMarks = 0;
+
+  // Map each section in the API data to our new format
+  const sections = quiz.map((section) => {
+    // Transform each active question in the section
+    const questions = section.questions
+      .filter((q) => q.is_active)
+      .map((q) => {
+        totalMarks += q.marks;
+        return {
+          question: q.question,
+          options: q.options,
+          correctAnswer: q.correct_answer,
+          score: q.marks,
+        };
+      });
+
+    return {
+      name: section.title,
+      questions,
+    };
+  });
+
+  return {
+    title: "My Quiz Title", // This title can be set dynamically if needed
+    totalMarks,
+    sections,
+  };
+}
+
+// Example usage:
+const apiData = {
+  "data": {
+      "status": "success",
+      "message": "Quiz uploaded successfully",
+      "quizFile": "quadragen-content-files/quizes/1740659257084_MBA-Brochure_1740653415379.json",
+      "quiz": [
+          {
+              "title": "About D.Y. Patil",
+              "questions": [
+                  {
+                      "question": "What was the former position held by D.Y. Patil?",
+                      "options": [
+                          "Governor of Bihar",
+                          "Governor of Tripura",
+                          "Governor of West Bengal",
+                          "All of the above"
+                      ],
+                      "correct_answer": "All of the above",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "From which state in India is D.Y. Patil?",
+                      "options": [
+                          "Maharashtra",
+                          "Karnataka",
+                          "Gujarat",
+                          "Rajasthan"
+                      ],
+                      "correct_answer": "Maharashtra",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "What was D.Y. Patil's vision for youth in India?",
+                      "options": [
+                          "To provide greater educational opportunities",
+                          "To promote agriculture",
+                          "To promote business",
+                          "To promote tourism"
+                      ],
+                      "correct_answer": "To provide greater educational opportunities",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "How many deemed universities has D.Y. Patil envisioned?",
+                      "options": [
+                          "1",
+                          "2",
+                          "3",
+                          "4"
+                      ],
+                      "correct_answer": "3",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "What was the purpose of establishing the Centre of Online Learning (COL)?",
+                      "options": [
+                          "To bridge the gap between industry expectations and student skills",
+                          "To promote online education",
+                          "To offer more courses",
+                          "To increase enrollment"
+                      ],
+                      "correct_answer": "To bridge the gap between industry expectations and student skills",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "What is D.Y. Patil's principle for success in life?",
+                      "options": [
+                          "Follow your passion",
+                          "Work hard",
+                          "Ego is the death of life",
+                          "Never give up"
+                      ],
+                      "correct_answer": "Ego is the death of life",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "From which town in Maharashtra is D.Y. Patil?",
+                      "options": [
+                          "Kolhapur",
+                          "Pune",
+                          "Mumbai",
+                          "Nagpur"
+                      ],
+                      "correct_answer": "Kolhapur",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "How many independent institutions has D.Y. Patil envisioned?",
+                      "options": [
+                          "100",
+                          "150",
+                          "200",
+                          "250"
+                      ],
+                      "correct_answer": "150",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "What was D.Y. Patil's goal?",
+                      "options": [
+                          "To spread education across India",
+                          "To promote business",
+                          "To promote agriculture",
+                          "To promote tourism"
+                      ],
+                      "correct_answer": "To spread education across India",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "What is D.Y. Patil's profession?",
+                      "options": [
+                          "Educationist",
+                          "Businessman",
+                          "Politician",
+                          "Agriculturist"
+                      ],
+                      "correct_answer": "Educationist",
+                      "marks": 1.2,
+                      "is_active": true
+                  }
+              ],
+              "is_active": true
+          },
+          {
+              "title": "MBA Overview",
+              "questions": [
+                  {
+                      "question": "What is the duration of the MBA program?",
+                      "options": [
+                          "1 year",
+                          "2 years",
+                          "3 years",
+                          "4 years"
+                      ],
+                      "correct_answer": "2 years",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "How many specializations are offered in the MBA program?",
+                      "options": [
+                          "8",
+                          "10",
+                          "11",
+                          "12"
+                      ],
+                      "correct_answer": "11",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "What is the mode of instruction for the MBA program?",
+                      "options": [
+                          "Online",
+                          "Offline",
+                          "Hybrid",
+                          "Both online and offline"
+                      ],
+                      "correct_answer": "Online",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "How many live masterclasses are included in the MBA program?",
+                      "options": [
+                          "1",
+                          "2",
+                          "3",
+                          "4"
+                      ],
+                      "correct_answer": "1",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "What is the learning approach of the MBA program?",
+                      "options": [
+                          "Flexible learning",
+                          "Rigid learning",
+                          "Self-paced learning",
+                          "Classroom learning"
+                      ],
+                      "correct_answer": "Flexible learning",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "What is the adherence of the MBA program?",
+                      "options": [
+                          "4 Quadrants of UGC",
+                          "3 Quadrants of UGC",
+                          "2 Quadrants of UGC",
+                          "5 Quadrants of UGC"
+                      ],
+                      "correct_answer": "4 Quadrants of UGC",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "Which of the following is a highlight of the MBA program?",
+                      "options": [
+                          "Placement assistance",
+                          "Cutting-edge curriculum",
+                          "Industry connect",
+                          "All of the above"
+                      ],
+                      "correct_answer": "All of the above",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "What is the focus of the MBA program?",
+                      "options": [
+                          "Business case studies",
+                          "Real-world examples",
+                          "Both business case studies and real-world examples",
+                          "None of the above"
+                      ],
+                      "correct_answer": "Both business case studies and real-world examples",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "Who designed the MBA program?",
+                      "options": [
+                          "Business professionals",
+                          "Academicians",
+                          "Both business professionals and academicians",
+                          "None of the above"
+                      ],
+                      "correct_answer": "Both business professionals and academicians",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "What is the purpose of the MBA program?",
+                      "options": [
+                          "To bridge the gap between industry expectations and student skills",
+                          "To provide theoretical knowledge",
+                          "To promote online education",
+                          "To increase enrollment"
+                      ],
+                      "correct_answer": "To bridge the gap between industry expectations and student skills",
+                      "marks": 1.2,
+                      "is_active": true
+                  }
+              ],
+              "is_active": true
+          },
+          {
+              "title": "Why D.Y. Patil?",
+              "questions": [
+                  {
+                      "question": "What is one of the advantages of studying at D.Y. Patil University?",
+                      "options": [
+                          "Flexible learning",
+                          "Limited course options",
+                          "Rigid learning schedule",
+                          "No industry connect"
+                      ],
+                      "correct_answer": "Flexible learning",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "What is offered at D.Y. Patil University?",
+                      "options": [
+                          "A wide range of courses across multiple disciplines",
+                          "Limited course options",
+                          "Only MBA courses",
+                          "Only engineering courses"
+                      ],
+                      "correct_answer": "A wide range of courses across multiple disciplines",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "How is the virtual classroom experience at D.Y. Patil University?",
+                      "options": [
+                          "Interactive",
+                          "Boring",
+                          "One-way communication",
+                          "No virtual classroom"
+                      ],
+                      "correct_answer": "Interactive",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "Who teaches at D.Y. Patil University?",
+                      "options": [
+                          "Distinguished faculty members and industry experts",
+                          "Inexperienced faculty",
+                          "Only industry experts",
+                          "Only faculty members"
+                      ],
+                      "correct_answer": "Distinguished faculty members and industry experts",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "What kind of support services are provided at D.Y. Patil University?",
+                      "options": [
+                          "Comprehensive support services",
+                          "Limited support services",
+                          "No support services",
+                          "Only academic support services"
+                      ],
+                      "correct_answer": "Comprehensive support services",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "How are exams conducted at D.Y. Patil University?",
+                      "options": [
+                          "Online exams from any location with internet access",
+                          "Only on-campus exams",
+                          "No exams",
+                          "Both online and on-campus exams"
+                      ],
+                      "correct_answer": "Online exams from any location with internet access",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "What is the learning approach at D.Y. Patil University?",
+                      "options": [
+                          "Flexible learning",
+                          "Rigid learning schedule",
+                          "Self-paced learning",
+                          "Classroom learning"
+                      ],
+                      "correct_answer": "Flexible learning",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "What is the purpose of the dedicated relationship officers at D.Y. Patil University?",
+                      "options": [
+                          "To provide personalized support throughout the journey",
+                          "To handle admissions",
+                          "To teach courses",
+                          "To conduct exams"
+                      ],
+                      "correct_answer": "To provide personalized support throughout the journey",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "What is the advantage of the virtual classroom environment at D.Y. Patil University?",
+                      "options": [
+                          "Interactive and engaging",
+                          "Boring and one-way communication",
+                          "No virtual classroom",
+                          "Limited interaction"
+                      ],
+                      "correct_answer": "Interactive and engaging",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "What is the advantage of the faculty at D.Y. Patil University?",
+                      "options": [
+                          "Distinguished and experienced",
+                          "Inexperienced",
+                          "Only industry experts",
+                          "Only academicians"
+                      ],
+                      "correct_answer": "Distinguished and experienced",
+                      "marks": 1.2,
+                      "is_active": true
+                  }
+              ],
+              "is_active": true
+          },
+          {
+              "title": "MBA Specializations",
+              "questions": [
+                  {
+                      "question": "Which of the following is a specialization offered in the MBA program?",
+                      "options": [
+                          "Sales and Marketing Management",
+                          "Human Resource Management",
+                          "Hospital and Healthcare Management",
+                          "All of the above"
+                      ],
+                      "correct_answer": "All of the above",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "What is the specialization related to digital marketing?",
+                      "options": [
+                          "Digital Marketing Management",
+                          "Marketing Management",
+                          "Sales Management",
+                          "Retail Management"
+                      ],
+                      "correct_answer": "Digital Marketing Management",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "Which specialization focuses on finance?",
+                      "options": [
+                          "Finance Management",
+                          "Accounting Management",
+                          "Banking Management",
+                          "Financial Planning"
+                      ],
+                      "correct_answer": "Finance Management",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "What is the specialization related to supply chain and logistics?",
+                      "options": [
+                          "Logistics and Supply Chain Management",
+                          "Operations Management",
+                          "Project Management",
+                          "Production Management"
+                      ],
+                      "correct_answer": "Logistics and Supply Chain Management",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "Which specialization combines data science and business analytics?",
+                      "options": [
+                          "Data Science and Business Analytics",
+                          "Business Analytics",
+                          "Data Science",
+                          "Data Management"
+                      ],
+                      "correct_answer": "Data Science and Business Analytics",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "What is the specialization focused on international business?",
+                      "options": [
+                          "International Business Management",
+                          "Global Business Management",
+                          "Export-Import Management",
+                          "Foreign Trade Management"
+                      ],
+                      "correct_answer": "International Business Management",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "Which specialization is related to starting and running a business?",
+                      "options": [
+                          "Entrepreneurship Management",
+                          "Business Management",
+                          "Management Studies",
+                          "Business Administration"
+                      ],
+                      "correct_answer": "Entrepreneurship Management",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "What is the specialization focused on managing events?",
+                      "options": [
+                          "Event Management",
+                          "Event Planning",
+                          "Event Organizing",
+                          "Event Marketing"
+                      ],
+                      "correct_answer": "Event Management",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "Which specialization is related to retail operations?",
+                      "options": [
+                          "Retail Management",
+                          "Retail Operations",
+                          "Retail Marketing",
+                          "Retail Sales"
+                      ],
+                      "correct_answer": "Retail Management",
+                      "marks": 1.2,
+                      "is_active": true
+                  },
+                  {
+                      "question": "How many specializations are offered in the MBA program?",
+                      "options": [
+                          "8",
+                          "10",
+                          "11",
+                          "12"
+                      ],
+                      "correct_answer": "11",
+                      "marks": 1.2,
+                      "is_active": true
+                  }
+              ],
+              "is_active": true
+          }
+      ]
+  }
+}
+const quizData = JSON.parse(localStorage.getItem("quizData"));
+const initialData = transformQuizData(quizData);
+console.log(initialData);
+
+
 // Calculate total marks
 initialData.totalMarks = initialData.sections.reduce(
   (total, section) =>
@@ -446,10 +998,10 @@ export default function QuizPreview() {
             textAlign: "center",
             fontSize: "25px",
             fontWeight: "900",
-            width: 300,
+       
           }}
         />
-        <IconButton
+        {/* <IconButton
           onClick={() =>
             toggleSaveField("quizTitle", (newVal) => handleQuizTitleChange(newVal))
           }
@@ -459,12 +1011,12 @@ export default function QuizPreview() {
           ) : (
             <EditOutlined fontSize="small" />
           )}
-        </IconButton>
+        </IconButton> */}
 
         {/* Right Container: Total Marks + Publish Button */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <Typography variant="h6" sx={{ fontWeight: "bold", color: "#333" }}>
-            Total Marks: {quizData.totalMarks}
+            Total Marks: {quizData.totalMarks.toFixed(0)}
           </Typography>
           <Button
             variant="contained"
@@ -549,15 +1101,7 @@ export default function QuizPreview() {
                           {section.name}
                         </Typography>
                       )}
-                      <IconButton
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setDeleteDialog({ open: true, index });
-                        }}
-                        size="small"
-                      >
-                        <Delete fontSize="small" />
-                      </IconButton>
+                      
                     </Box>
                   }
                 />
@@ -698,8 +1242,8 @@ export default function QuizPreview() {
                         value={
                           editing[`score-${selectedTab}-${questionIdx}`]
                             ? draft[`score-${selectedTab}-${questionIdx}`] ??
-                              question.score
-                            : question.score
+                              question.score?.toFixed(1)
+                            : question.score?.toFixed(1)
                         }
                         onChange={(e) => {
                           if (editing[`score-${selectedTab}-${questionIdx}`]) {
