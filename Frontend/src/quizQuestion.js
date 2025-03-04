@@ -60,11 +60,16 @@ const QuizQuestion = () => {
  const currentQuestionValue = transformedData?.sections?.slice(0, sectionIndex)?.reduce((sum, sec) => sum + sec.questions.length, 0) + questionIndex + 1; // Sum previous + current index
 
  
- AWS.config.update({
-   accessKeyId: "AKIATTSKGAGFDMILU77D", 
-   secretAccessKey: "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", 
-   region: 'us-east-1', // Adjust the region if needed
- });
+//  AWS.config.update({
+//    accessKeyId: "AKIATTSKGAGFDMILU77D", 
+//    secretAccessKey: "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", 
+//    region: 'us-east-1', // Adjust the region if needed
+//  });
+AWS.config.update({
+  accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
+  secretAccessKey:process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
+  region: "us-east-1", // Adjust the region if needed
+});
   const handleChange = (index,questionText,optionName) => {
     setSelectedValue(index);
     setSelectedAnswers((prev) => ({

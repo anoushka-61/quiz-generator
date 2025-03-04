@@ -25,9 +25,15 @@ import { Sparkles } from "lucide-react"; // Using lucide-react for the icon
 import axios from "axios";
 import AWS from "aws-sdk";
 
+// AWS.config.update({
+//   accessKeyId: "AKIATTSKGAGFDMILU77D",
+//   secretAccessKey: "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",
+//   region: "us-east-1", // Adjust the region if needed
+// });
+
 AWS.config.update({
-  accessKeyId: "AKIATTSKGAGFDMILU77D",
-  secretAccessKey: "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",
+  accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
+  secretAccessKey:process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
   region: "us-east-1", // Adjust the region if needed
 });
 
