@@ -131,22 +131,25 @@ const QuizGenerator = () => {
         setFileFailure(err);
         setUploadingFile(false);
       } else {
-        setLoading(false);
-        toast.success("Upload successful!", {
-          style: {
-            background: "#E6F4EA", // Light green background
-            color: "#1E4620", // Dark green text for contrast
-            padding: "12px 20px",
-            borderRadius: "8px",
-            border: "1px solid #A3D9A5", // Green border for a soft look
-            boxShadow: "0px 4px 10px rgba(163, 217, 165, 0.5)", // Subtle glow
-          },
-        });
-        setResponseFile(data);
-        setShowForm(true);
-        setUploadingFile(false);
+        setTimeout(()=>{
+          setLoading(false);
+          toast.success("Upload successful!", {
+            style: {
+              background: "#E6F4EA", // Light green background
+              color: "#1E4620", // Dark green text for contrast
+              padding: "12px 20px",
+              borderRadius: "8px",
+              border: "1px solid #A3D9A5", // Green border for a soft look
+              boxShadow: "0px 4px 10px rgba(163, 217, 165, 0.5)", // Subtle glow
+            },
+          });
+          setResponseFile(data);
+          setShowForm(true);
+          setUploadingFile(false);
+        },15000)
         // Optionally, you can use data.Location as the URL of the uploaded file.
       }
+      
     });
   };
 
@@ -219,7 +222,7 @@ const QuizGenerator = () => {
           },
         });
         localStorage.setItem("quizData", JSON.stringify(response.data));
-        navigate("/quiz-preview", { state: response.data });
+        navigate("/quiz-preview?courseId=" + fileKey, { state: response.data });
         // In success scenario, call GET API immediately.
         // await fetchQuizData();
       } else {
@@ -266,7 +269,7 @@ const QuizGenerator = () => {
         `https://hojir3vx1i.execute-api.us-east-1.amazonaws.com/default/quadragen-getQuizById?courseId=${courseId}`
       );
       localStorage.setItem("quizData", JSON.stringify(getResponse.data));
-      navigate("/quiz-preview", { state: getResponse.data });
+      navigate("/quiz-preview?courseId=" + fileKey, { state: getResponse.data });
     } catch (err) {
       console.error("Error fetching quiz data:", err);
       toast.error("Failed to fetch quiz data. Please try again later.");

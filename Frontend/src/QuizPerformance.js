@@ -15,7 +15,7 @@ const QuizPerformance = ({ strengths, weaknesses }) => {
         <p className="section-desc">
           These are the topics you're excelling in. Keep up the great work! 🎯
         </p>
-        {strengths.length > 0 ? (
+        {strengths?.length > 0 ? (
           strengths.map((item, idx) => (
             <div key={idx} className="progress-bar">
               <span>{item.topic}</span>
@@ -41,7 +41,7 @@ const QuizPerformance = ({ strengths, weaknesses }) => {
         <p className="section-desc">
           These are areas that need improvement. Focus on these topics to boost your score! 🚀
         </p>
-        {weaknesses.length > 0 ? (
+        {weaknesses?.length > 0 ? (
           weaknesses.map((item, idx) => (
             <div key={idx} className="progress-bar">
               <span>{item.topic}</span>

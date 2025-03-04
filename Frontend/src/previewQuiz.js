@@ -21,10 +21,12 @@ import {
   Delete,
   Publish,
 } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useSearchParams } from "react-router-dom";
 
 function transformQuizData(apiData) {
   // Destructure the quiz array from the API data
+ 
+
   const { quiz } = apiData?.data || {};
   let totalMarks = 0;
   // Map each section in the API data to our new format
@@ -553,6 +555,8 @@ export default function QuizPreview() {
   const [quizData, setQuizData] = useState({});
   const [selectedTab, setSelectedTab] = useState(0);
   const [editing, setEditing] = useState({});
+  const [searchParams] = useSearchParams();
+  const courseId = searchParams.get("courseId")||"";
   const [deleteDialog, setDeleteDialog] = useState({
     open: false,
     index: null,
@@ -719,6 +723,11 @@ export default function QuizPreview() {
             variant="contained"
             color="primary"
             startIcon={<Publish />}
+            onClick={() => {
+              let result = courseId?.match(/course_\d+/)?.[0];
+
+              navigate(`/quiz-instruction?courseId=${result}`)}}
+
             sx={{ textTransform: "none" ,backgroundImage:
                             "linear-gradient(135deg, #FF69B4, #8A2BE2)", // Gradient background
                       "&:hover": {

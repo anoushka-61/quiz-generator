@@ -4,9 +4,9 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import QuizGenerator from './generateQuiz';
 import QuizPreview from './previewQuiz';
 import { Toaster } from 'react-hot-toast';
-import QuizQuestion from './LearnerUI/quizQuestion';
-import Instruction from './LearnerUI/instruction';
-import ResultAndReccomend from "./LearnerUI/ResultAndReccomend"
+import QuizQuestion from './quizQuestion';
+import Instruction from './instruction';
+import ResultAndReccomend from "./ResultAndReccomend"
 function App() {
   return (
     <div className="App">

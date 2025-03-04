@@ -10,11 +10,12 @@ import MultipleSectionsQuestions from "./MultipleSectionsQuestions";
 import { toast } from "react-hot-toast";
 import AWS from 'aws-sdk';
 import { useSearchParams,useNavigate } from "react-router-dom";
-import QuizLoader from "../QuizLoader";
+import QuizLoader from "./QuizLoader";
 const QuizQuestion = () => {
   const [searchParams]=useSearchParams()
   const navigate = useNavigate()
     const courseId = searchParams.get('courseId')||"";
+    const [apiParam , setApiParam] = useState("")
  
   const s3 = new AWS.S3();
   const transformQuizData = (quizData) => {
@@ -97,7 +98,7 @@ const QuizQuestion = () => {
     const timestamp = Date.now();
     const quizResponsesJSON = generateQuizResponsesJSON(transformedData, selectedAnswers);
     console.log(quizResponsesJSON,typeof quizResponsesJSON ,quizResponsesJSON.type,"aaaaaaaaaaaaaaaa")
-    const key = `learnerResponses/${courseId}_${timestamp}`;
+    const key = `learnerResponses/${courseId}`;
     const jsonString = JSON.stringify(quizResponsesJSON, null, 2)
     const params = {
       Bucket: "quadragen-content-files",
@@ -116,28 +117,30 @@ const QuizQuestion = () => {
             // setFileFailure(err);
             // setUploadingFile(false);
           } else {
-            console.log('File uploaded successfully:', data.Location);
-            // setLoading(false);
-            setLoading(false)
-            toast.success("Upload successful!",{
-                style: {
-              background: "#E6F4EA", // Light green background
-              color: "#1E4620", // Dark green text for contrast
-              padding: "12px 20px",
-              borderRadius: "8px",
-              border: "1px solid #A3D9A5", // Green border for a soft look
-              boxShadow: "0px 4px 10px rgba(163, 217, 165, 0.5)", // Subtle glow
-            },
-            });
+        
             // setResponseFile(data);
             // setShowForm(true);
             // setUploadingFile(false);
             // Optionally, you can use data.Location as the URL of the uploaded file.
           }
         });
-       
-    navigate("/result-recommend?courseId="+courseId)
-  }
+    setTimeout(()=>{
+     
+      setLoading(false)
+      toast.success("Upload successful!",{
+          style: {
+        background: "#E6F4EA", // Light green background
+        color: "#1E4620", // Dark green text for contrast
+        padding: "12px 20px",
+        borderRadius: "8px",
+        border: "1px solid #A3D9A5", // Green border for a soft look
+        boxShadow: "0px 4px 10px rgba(163, 217, 165, 0.5)", // Subtle glow
+      },
+      });
+    
+      navigate(`/result-recommend?courseId=${courseId}`)},60000)   
+    
+  } 
   const handleNextQuestion = () => {
     if (questionIndex < currentSection.questions.length - 1) {
       // Move to the next question within the same section
@@ -152,7 +155,7 @@ const QuizQuestion = () => {
       console.log(selectedAnswers)
       const quizResponsesJSON = generateQuizResponsesJSON(transformedData, selectedAnswers);
       handleEndQuiz()
-      navigate("/result-recommend?courseId="+courseId)
+      navigate(`/result-recommend?courseId=${apiParam}`)
     }}
     const generateQuizResponsesJSON = (quizData, selectedAnswers) => {
       return {
@@ -185,7 +188,12 @@ const QuizQuestion = () => {
       </Button>
       <div className="ml-auto flex gap-2 header-content-left">
         <Button variant="outlined" onClick={handleEndQuiz} sx={{ color: "#6439BF", border:"1px solid #6439BF", "&:hover": { backgroundColor: "#f0e9ff" ,color:"#6439BF"} }}>End Quiz</Button>
-        <Button variant="contained" onClick={handleNextQuestion} sx={{ backgroundColor: "#6439BF", "&:hover": { backgroundColor: "#512ea9" } }}>
+        <Button variant="contained" onClick={handleNextQuestion} sx={{ backgroundImage:
+                            "linear-gradient(135deg, #FF69B4, #8A2BE2)", // Gradient background
+                      "&:hover": {
+                        backgroundImage:
+                            "linear-gradient(135deg,#8A2BE2, #FF69B4)", // Darker blue on hover
+                      } }}>
  { isLastQuestion ? "Finish":"Next"} →
 </Button>
       </div>
